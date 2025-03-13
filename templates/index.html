@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalkulator Belki</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="/static/script.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Kalkulator Belki</h1>
+
+    <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number"></label>
+    <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number"></label>
+
+    <h2>Siły punktowe</h2>
+    <div id="forces-inputs"></div>
+
+    <button onclick="calculate()">Oblicz</button>
+    
+    <h3>Wynik: <span id="result"></span></h3>
+
+    <canvas id="momentChart"></canvas>
+</body>
+</html>
