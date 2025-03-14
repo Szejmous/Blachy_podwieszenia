@@ -10,16 +10,24 @@
 <body>
     <h1>Kalkulator Belki</h1>
 
-    <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number"></label>
-    <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number"></label>
+    <div>
+        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="0"></label><br>
+        <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number" value="0"></label>
+    </div>
 
     <h2>Siły punktowe</h2>
-    <div id="forces-inputs"></div>
+    <div id="forces-inputs" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
 
     <button onclick="calculate()">Oblicz</button>
     
-    <h3>Wynik: <span id="result"></span></h3>
+    <h3>Wynik: <span id="result" style="color: red;"></span></h3>
 
-    <canvas id="momentChart"></canvas>
+    <h2>Belka - obciążenie równomierne</h2>
+    <canvas id="uniformBeam" width="600" height="100"></canvas>
+    <canvas id="uniformMomentChart" width="600" height="200"></canvas>
+
+    <h2>Belka - obciążenia punktowe</h2>
+    <canvas id="pointBeam" width="600" height="100"></canvas>
+    <canvas id="pointMomentChart" width="600" height="200"></canvas>
 </body>
 </html>
