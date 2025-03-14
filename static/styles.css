@@ -14,7 +14,7 @@ h1, h2, h3 {
 /* Kontener dla wykresów */
 .chart-container {
     width: 100%;
-    /* Usunięto max-width: 600px, aby umożliwić pełne rozciągnięcie */
+    max-width: 600px; /* Przywrócono maksymalną szerokość */
     height: 300px; /* Stała wysokość ramki */
     margin-top: 10px;
     position: relative; /* Umożliwia pozycjonowanie canvasu */
