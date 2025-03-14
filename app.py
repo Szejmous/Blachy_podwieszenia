@@ -6,13 +6,13 @@ app = Flask(__name__)
 # Słownik z rozstawami fałd dla blach (w mm)
 BLACHY_ROZSTAWY = {
     "Pruszyński": {
-        "T130": 325,
-        "T135": 337,
-        "T135P": 337,
-        "T140": 350,
-        "T150": 375,
-        "T155": 387,
-        "T160": 400
+        "T130": 337,
+        "T135": 317,
+        "T135P": 310,
+        "T140": 304,
+        "T150": 290,
+        "T155": 280,
+        "T160": 260  # Poprawiona wartość
     },
     "ArcelorMittal": {
         "Hacierco 136/337": 337,
