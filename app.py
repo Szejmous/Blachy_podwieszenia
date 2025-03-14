@@ -1,113 +1,82 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, render_template, jsonify
 import numpy as np
 
 app = Flask(__name__)
 
-# Baza danych blach trapezowych
-BLACHY = {
-    "Pruszyński": {
-        "T130": 337,
-        "T135": 317,
-        "T135P": 310,
-        "T140": 304,
-        "T150": 290,
-        "T155": 280,
-        "T160": 260
-    },
-    "ArcelorMittal": {
-        "Hacierco 136/337": 337,
-        "Hacierco 135/315": 315,
-        "Hacierco 150/290": 290
-    },
-    "BP2": {
-        "T130": 337,
-        "T135-930": 310,
-        "T135-950": 316.67,
-        "T153-860": 287,
-        "T160": 250
-    }
-}
+# Lista producentów (dla dropdowna)
+producenci = ["Pruszyński", "ArcelorMittal", "BP2"]
 
 @app.route('/')
 def index():
-    return render_template("index.html", producenci=BLACHY.keys())
+    return render_template('index.html', producenci=producenci)
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    data = request.json
+    data = request.get_json()
+    
+    # Pobranie danych z formularza
+    L = float(data.get('beam_span', 1))  # Długość belki w metrach
+    load_kg_m2 = float(data.get('load_kg_m2', 0))  # Obciążenie w kg/m²
+    producent = data.get('producent', 'Pruszyński')
+    blacha = data.get('blacha', 'T130')
+    
+    # Przykładowe rozstawy belek dla producentów (w mm)
+    rozstawy = {
+        "Pruszyński": {"T130": 337, "T135": 333, "T135P": 333, "T140": 333, "T150": 333, "T155": 333, "T160": 333},
+        "ArcelorMittal": {"Hacierco 136/337": 337, "Hacierco 135/315": 315, "Hacierco 150/290": 290},
+        "BP2": {"T130": 337, "T135-930": 930, "T135-950": 950, "T153-860": 860, "T160": 1000}
+    }
+    spacing_mm = rozstawy[producent].get(blacha, 337)  # Rozstaw w mm
+    load_kg_m = load_kg_m2 * (spacing_mm / 1000)  # Obciążenie liniowe w kg/m
 
-    # Dane wejściowe
-    load_kg_m2 = float(data["load_kg_m2"])
-    producent = data["producent"]
-    blacha = data["blacha"]
-    spacing_mm = BLACHY[producent][blacha] / 1000  # Rozstaw z bazy w metrach
-    L = float(data["beam_span"])  # Rozpiętość belki w metrach
+    # Pobranie sił punktowych i ich pozycji
+    forces = [float(data.get(f'P{i}', 0)) for i in range(1, 7)]
+    distances = [float(data.get(f'x{i}', 0)) for i in range(1, 7)]
+    forces = [f for f in forces if f > 0]  # Usuń zera
+    distances = [d for d, f in zip(distances, forces) if f > 0]  # Usuń zera
 
-    # Obciążenie na fałdę (kg/m)
-    load_kg_m = load_kg_m2 * spacing_mm
+    # Walidacja danych
+    if L <= 0:
+        return jsonify({"status": "Błąd: Rozpiętość belki musi być większa od 0"})
+    if any(d < 0 or d > L for d in distances):
+        return jsonify({"status": "Błąd: Pozycje sił muszą być w zakresie [0, L]"})
+    if any(d1 >= d2 for d1, d2 in zip(distances, distances[1:])):
+        return jsonify({"status": "Błąd: Pozycje sił muszą być rosnące"})
 
-    # Siły punktowe i odległości
-    forces = []
-    distances = []
-    for i in range(6):
-        p = float(data.get(f"P{i+1}", 0))
-        x = float(data.get(f"x{i+1}", 0))
-        if p > 0 and (i == 0 or x > 0):  # Pomiń, jeśli P=0 lub x=0 (oprócz pierwszej siły)
-            forces.append(p)
-            distances.append(x)
+    # Obliczenia dla obciążenia równomiernego
+    x_values = np.arange(0, L + 0.1, 0.1)  # Dokładny zakres od 0 do L z krokiem 0.1 m
+    uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
+    max_uniform_moment = min(uniform_moment)  # Minimum, bo momenty są ujemne
+    max_continuous_moment_theoretical = - (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
-    # Obliczanie pozycji sił na belce
-    cumulative_distances = [0]
-    for i, x in enumerate(distances):
-        cumulative_distances.append(cumulative_distances[-1] + x)
-    cumulative_distances.pop(0)
-
-    # Moment maksymalny od obciążenia równomiernego (ql²/8, ujemny, bo w dół)
-    max_moment_uniform = -(load_kg_m * L**2) / 8
-
-    # Dokładniejszy wykres momentów od obciążenia równsomiernego (parabola, ujemna)
-    x_values = np.linspace(0, L, 50)
-    uniform_moment = [-(load_kg_m * x * (L - x)) / 2 for x in x_values]
-
-    # Obliczanie reakcji w podporach dla sił punktowych
-    R_A = 0  # Reakcja w lewej podporze
-    R_B = 0  # Reakcja w prawej podporze
-    for i, P in enumerate(forces):
-        x = cumulative_distances[i]
-        R_A += P * (L - x) / L  # Składowa reakcji w A
-        R_B += P * x / L        # Składowa reakcji w B
-
-    # Obliczanie momentów od sił punktowych w punktach sił i na końcach (ujemne)
-    moment_values = []  # Momenty w miejscach sił
-    point_moment_x = [0] + cumulative_distances + [L]  # Punkty x dla wykresu
-    point_moment_values = [0]  # Moment na początku belki (0)
-    current_moment = 0
-    for i, x in enumerate(cumulative_distances):
-        current_moment = -(R_A * x - sum(P * (x - d) for P, d in zip(forces, cumulative_distances) if d < x))
-        moment_values.append(current_moment)
-        point_moment_values.append(current_moment)
-    point_moment_values.append(0)  # Moment na końcu belki (0)
-
-    max_moment_forces = min([m for m in moment_values]) if moment_values else 0  # Minimum, bo ujemne
-
-    # Sprawdzenie poprawności podwieszenia
-    status = "Poprawne podwieszenie." if abs(max_moment_forces) <= abs(max_moment_uniform) else "Złe podwieszenie, zmniejsz obciążenie lub zmień lokalizację."
+    # Obliczenia dla obciążeń punktowych
+    R_A = sum(f * (L - d) for f, d in zip(forces, distances)) / L  # Reakcja w A
+    R_B = sum(f * d for f, d in zip(forces, distances)) / L  # Reakcja w B
+    point_moment_x = [0] + distances + [L]  # Kluczowe punkty: 0, miejsca sił, L
+    point_moment_values = []
+    for x in point_moment_x:
+        M = R_A * x
+        for f, d in zip(forces, distances):
+            if x > d:
+                M -= f * (x - d)
+        point_moment_values.append(-M)  # Ujemne wartości zgodnie z konwencją
+    max_point_moment = min(point_moment_values)  # Minimum, bo momenty są ujemne
 
     return jsonify({
-        "load_kg_m": load_kg_m,
+        "status": "Poprawne obliczenia",
         "L": L,
-        "spacing_mm": spacing_mm * 1000,  # Zwracam w mm dla frontend
-        "max_moment_uniform": max_moment_uniform,
-        "uniform_moment": uniform_moment,
+        "load_kg_m": load_kg_m,
+        "spacing_mm": spacing_mm,
         "x_values": x_values.tolist(),
-        "forces": forces,
-        "distances": cumulative_distances,
-        "moment_values": moment_values,
+        "uniform_moment": uniform_moment,
         "point_moment_x": point_moment_x,
         "point_moment_values": point_moment_values,
-        "max_moment_forces": max_moment_forces,
-        "status": status
+        "forces": forces,
+        "distances": distances,
+        "max_uniform_moment": max_uniform_moment,
+        "max_point_moment": max_point_moment,
+        "max_continuous_moment_theoretical": max_continuous_moment_theoretical
     })
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
