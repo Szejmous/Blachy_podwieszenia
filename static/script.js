@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
     }
-    updateBlachy(); // Wypełnij początko2wo listę blach
+    updateBlachy(); // Wypełnij początkowo listę blach
     calculate(); // Wykonaj obliczenia przy załadowaniu strony
 });
 
@@ -201,21 +201,23 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const xLabels = result.x_values.map(x => x.toFixed(1)); // Etykiety co L/10
-    console.log("xLabels:", xLabels); // Diagnostyka
-    console.log("point_moment_values:", result.point_moment_values); // Diagnostyka
+    const xValues = result.x_values; // Używamy surowych wartości x_values
+    console.log("xValues:", xValues);
+    console.log("point_moment_values:", result.point_moment_values);
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
-    uniformCanvas.style.width = '100%'; // Upewnij się, że canvas dostosowuje się do kontenera
+    uniformCanvas.style.width = '100%';
     uniformCanvas.style.height = '100%';
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
-            labels: xLabels,
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.uniform_moment,
+                data: result.uniform_moment.map((moment, index) => ({
+                    x: xValues[index],
+                    y: moment
+                })),
                 borderColor: 'blue',
                 borderWidth: 2,
                 fill: false,
@@ -227,14 +229,15 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
                     ticks: {
                         stepSize: L / 10,
                         font: { size: 14 },
-                        callback: function(value, index, values) {
-                            return xLabels[index]; // Upewnij się, że etykiety są zgodne z xLabels
+                        callback: function(value) {
+                            return value.toFixed(1);
                         }
                     }
                 },
@@ -255,7 +258,7 @@ function drawCharts(result) {
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
+                            return `Moment: ${context.parsed.y.toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
@@ -265,15 +268,17 @@ function drawCharts(result) {
 
     // Wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
-    pointCanvas.style.width = '100%'; // Upewnij się, że canvas dostosowuje się do kontenera
+    pointCanvas.style.width = '100%';
     pointCanvas.style.height = '100%';
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
-            labels: xLabels,
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.point_moment_values,
+                data: result.point_moment_values.map((moment, index) => ({
+                    x: xValues[index],
+                    y: moment
+                })),
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: false,
@@ -285,14 +290,15 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
                     ticks: {
                         stepSize: L / 10,
                         font: { size: 14 },
-                        callback: function(value, index, values) {
-                            return xLabels[index]; // Upewnij się, że etykiety są zgodne z xLabels
+                        callback: function(value) {
+                            return value.toFixed(1);
                         }
                     }
                 },
@@ -313,7 +319,7 @@ function drawCharts(result) {
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
+                            return `Moment: ${context.parsed.y.toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
