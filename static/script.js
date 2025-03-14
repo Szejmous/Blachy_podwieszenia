@@ -1,5 +1,12 @@
 let uniformChart, pointChart;
 
+// Baza blach w JavaScript (dla dynamicznego wypełniania listy)
+const BLACHY = {
+    "Pruszyński": ["T130", "T135", "T135P", "T140", "T150", "T155", "T160"],
+    "ArcelorMittal": ["Hacierco 136/337", "Hacierco 135/315", "Hacierco 150/290"],
+    "BP2": ["T130", "T135-930", "T135-950", "T153-860", "T160"]
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     let forcesDiv = document.getElementById("forces-inputs");
     for (let i = 1; i <= 6; i++) {
@@ -10,12 +17,26 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
     }
+    updateBlachy(); // Wypełnij początkowo listę blach
 });
+
+function updateBlachy() {
+    let producent = document.getElementById("producent").value;
+    let blachaSelect = document.getElementById("blacha");
+    blachaSelect.innerHTML = ""; // Wyczyść aktualne opcje
+    BLACHY[producent].forEach(blacha => {
+        let option = document.createElement("option");
+        option.value = blacha;
+        option.text = blacha;
+        blachaSelect.appendChild(option);
+    });
+}
 
 async function calculate() {
     let data = {
         load_kg_m2: document.getElementById("load_kg_m2").value,
-        spacing_mm: document.getElementById("spacing_mm").value,
+        producent: document.getElementById("producent").value,
+        blacha: document.getElementById("blacha").value,
         beam_span: document.getElementById("beam_span").value
     };
 
@@ -57,7 +78,7 @@ function drawBeams(result) {
     uniformCtx.lineTo(canvasWidth, 45);
     uniformCtx.stroke();
     uniformCtx.fillStyle = "black";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m`, canvasWidth / 2 - 30, 10);
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 60, 10);
 
     // Wymiar całkowity z znakami architektonicznymi
     uniformCtx.beginPath();
@@ -145,7 +166,7 @@ function drawCharts(result) {
                         content: `${result.max_moment_uniform.toFixed(2)} kg·m`,
                         color: 'blue',
                         position: 'top',
-                        yAdjust: -10 // Przesunięcie nad linię
+                        yAdjust: -10
                     }, {
                         type: 'line',
                         yMin: result.max_moment_uniform,
@@ -183,7 +204,7 @@ function drawCharts(result) {
                         content: `${m.toFixed(2)} kg·m`,
                         color: 'blue',
                         position: 'top',
-                        yAdjust: -10 // Przesunięcie nad linię
+                        yAdjust: -10
                     })).concat({
                         type: 'line',
                         yMin: result.max_moment_forces,
