@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 1; i <= 6; i++) {
         forcesDiv.innerHTML += `
             <div>
-                <label>P${i} (kg): <input id="P${i}" type="number" value="0"></label>
-                <label>x${i} (m): <input id="x${i}" type="number" value="0"></label>
+                <label class="force-label">P${i} (kg): <input id="P${i}" type="number" value="0"></label>
+                <label class="distance-label">x${i} (m): <input id="x${i}" type="number" value="0"></label>
             </div>
         `;
     }
@@ -45,6 +45,7 @@ function drawBeams(result) {
     let uniformCtx = document.getElementById("uniformBeam").getContext("2d");
     uniformCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     uniformCtx.beginPath();
+    uniformCtx.strokeStyle = "black";
     uniformCtx.moveTo(10, 25); // Belka
     uniformCtx.lineTo(canvasWidth - 10, 25);
     uniformCtx.moveTo(10, 25); // Podpora lewa (trójkąt)
@@ -55,6 +56,7 @@ function drawBeams(result) {
     uniformCtx.lineTo(canvasWidth - 20, 45);
     uniformCtx.lineTo(canvasWidth, 45);
     uniformCtx.stroke();
+    uniformCtx.fillStyle = "black";
     uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m`, canvasWidth / 2 - 30, 10);
 
     // Wymiar całkowity z znakami architektonicznymi
@@ -70,6 +72,7 @@ function drawBeams(result) {
     let pointCtx = document.getElementById("pointBeam").getContext("2d");
     pointCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     pointCtx.beginPath();
+    pointCtx.strokeStyle = "black";
     pointCtx.moveTo(10, 25); // Belka
     pointCtx.lineTo(canvasWidth - 10, 25);
     pointCtx.moveTo(10, 25); // Podpora lewa (trójkąt)
@@ -83,14 +86,19 @@ function drawBeams(result) {
     let L = result.L;
     for (let i = 0; i < result.forces.length; i++) {
         let x = 10 + (result.distances[i] / L) * (canvasWidth - 20);
+        pointCtx.strokeStyle = "blue"; // Kolor sił
+        pointCtx.beginPath();
         pointCtx.moveTo(x, 25);
         pointCtx.lineTo(x, 15); // Strzałka w dół
         pointCtx.lineTo(x - 5, 20); pointCtx.moveTo(x, 15); pointCtx.lineTo(x + 5, 20);
+        pointCtx.stroke();
+        pointCtx.fillStyle = "blue";
         pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, 10);
     }
-    pointCtx.stroke();
 
     // Wymiary z domiarami i znakami architektonicznymi
+    pointCtx.strokeStyle = "green"; // Kolor odległości
+    pointCtx.fillStyle = "green";
     pointCtx.beginPath();
     let prevX = 10;
     for (let i = 0; i < result.distances.length; i++) {
@@ -99,14 +107,14 @@ function drawBeams(result) {
         pointCtx.lineTo(x, 45);
         pointCtx.moveTo(prevX, 40); pointCtx.lineTo(prevX + 5, 45); pointCtx.lineTo(prevX, 50); // Znak początkowy
         pointCtx.moveTo(x, 40); pointCtx.lineTo(x - 5, 45); pointCtx.lineTo(x, 50); // Znak końcowy
-        pointCtx.fillText(`${result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)} m`, (prevX + x) / 2 - 10, 40);
+        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, 40);
         prevX = x;
     }
     pointCtx.moveTo(prevX, 45);
     pointCtx.lineTo(canvasWidth - 10, 45);
     pointCtx.moveTo(prevX, 40); pointCtx.lineTo(prevX + 5, 45); pointCtx.lineTo(prevX, 50);
     pointCtx.moveTo(canvasWidth - 10, 40); pointCtx.lineTo(canvasWidth - 15, 45); pointCtx.lineTo(canvasWidth - 10, 50);
-    pointCtx.fillText(`${L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)} m`, (prevX + canvasWidth - 10) / 2 - 10, 40);
+    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - 10) / 2 - 10, 40);
     pointCtx.stroke();
 }
 
@@ -131,6 +139,14 @@ function drawCharts(result) {
             plugins: {
                 annotation: {
                     annotations: [{
+                        type: 'label',
+                        xValue: (L / 2).toFixed(2), // Maksimum w połowie belki
+                        yValue: result.max_moment_uniform,
+                        content: `${result.max_moment_uniform.toFixed(2)} kg·m`,
+                        color: 'blue',
+                        position: 'top',
+                        yAdjust: -10 // Przesunięcie nad linię
+                    }, {
                         type: 'line',
                         yMin: result.max_moment_uniform,
                         yMax: result.max_moment_uniform,
@@ -145,15 +161,13 @@ function drawCharts(result) {
 
     // Wykres momentów - obciążenia punktowe
     if (pointChart) pointChart.destroy();
-    let pointMoments = [0, ...result.moment_values, 0];
-    let pointLabels = ["0", ...result.distances.map((d, i) => `x${i + 1}`), `${L}`];
     pointChart = new Chart(document.getElementById("pointMomentChart").getContext("2d"), {
         type: 'line',
         data: {
-            labels: pointLabels,
+            labels: result.point_moment_x.map(x => x.toFixed(2)),
             datasets: [{
                 label: "Moment od sił punktowych",
-                data: pointMoments,
+                data: result.point_moment_values,
                 borderColor: "red",
                 fill: false
             }]
@@ -163,12 +177,13 @@ function drawCharts(result) {
             plugins: {
                 annotation: {
                     annotations: result.moment_values.map((m, i) => ({
-                        type: 'point',
-                        xValue: pointLabels[i + 1],
+                        type: 'label',
+                        xValue: result.point_moment_x[i + 1].toFixed(2),
                         yValue: m,
-                        backgroundColor: 'red',
-                        radius: 4,
-                        label: { content: `${m.toFixed(2)} kg·m`, enabled: true }
+                        content: `${m.toFixed(2)} kg·m`,
+                        color: 'blue',
+                        position: 'top',
+                        yAdjust: -10 // Przesunięcie nad linię
                     })).concat({
                         type: 'line',
                         yMin: result.max_moment_forces,
