@@ -2,6 +2,9 @@ body {
     font-family: Arial, sans-serif;
     margin: 20px;
     background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Wyśrodkowanie elementów */
 }
 
 h1, h2, h3 {
@@ -9,11 +12,16 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 600px; /* Stała szerokość dla spójności */
+    width: 600px !important; /* Stała szerokość dla belek i wykresów */
     height: 100px; /* Stała wysokość dla belek */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
+    display: block;
+}
+
+#uniformMomentChart, #pointMomentChart {
+    height: 300px !important; /* Wysokość dla wykresów */
 }
 
 .input-container {
