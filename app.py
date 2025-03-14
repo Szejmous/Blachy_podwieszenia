@@ -53,10 +53,11 @@ def calculate():
     x_values = np.arange(0, L + x_step, x_step)  # Pełny zakres od 0 do L
     uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
 
-    # Obliczenia dla obciążeń punktowych
+    # Obliczenia dla obciążeń punktowych w punktach co L/10
     R_A = sum(f * (L - d) for f, d in zip(forces, absolute_distances)) / L  # Reakcja w A
     R_B = sum(f * d for f, d in zip(forces, absolute_distances)) / L  # Reakcja w B
-    point_moment_x = [0] + absolute_distances + [L]  # Kluczowe punkty: 0, miejsca sił, L
+    step = L / 10  # Krok co L/10
+    point_moment_x = np.arange(0, L + step, step)  # Punkty co L/10
     point_moment_values = []
     for x in point_moment_x:
         M = R_A * x
@@ -77,7 +78,7 @@ def calculate():
         "spacing_mm": spacing_mm,
         "x_values": x_values.tolist(),
         "uniform_moment": uniform_moment,
-        "point_moment_x": point_moment_x,
+        "point_moment_x": point_moment_x.tolist(),
         "point_moment_values": point_moment_values,
         "forces": forces,
         "distances": absolute_distances,  # Zwracamy absolutne pozycje
