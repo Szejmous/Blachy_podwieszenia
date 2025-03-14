@@ -9,6 +9,8 @@ h1, h2, h3 {
 }
 
 canvas {
+    width: 80%; /* 80% szerokości okna */
+    height: auto; /* Automatyczna wysokość na podstawie proporcji */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
