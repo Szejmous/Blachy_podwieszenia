@@ -3,6 +3,31 @@ import numpy as np
 
 app = Flask(__name__)
 
+# Słownik z rozstawami fałd dla blach (w mm)
+BLACHY_ROZSTAWY = {
+    "Pruszyński": {
+        "T130": 325,
+        "T135": 337,
+        "T135P": 337,
+        "T140": 350,
+        "T150": 375,
+        "T155": 387,
+        "T160": 400
+    },
+    "ArcelorMittal": {
+        "Hacierco 136/337": 337,
+        "Hacierco 135/315": 315,
+        "Hacierco 150/290": 290
+    },
+    "BP2": {
+        "T130": 325,
+        "T135-930": 310,
+        "T135-950": 317,
+        "T153-860": 287,
+        "T160": 320
+    }
+}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -19,9 +44,11 @@ def calculate():
     # Zaokrąglenie L do najbliższej wartości podzielnej przez 0.1 m
     L = round(L * 10) / 10  # Zaokrąglamy do 1 miejsca po przecinku
 
-    # Obliczenie obciążenia liniowego na podstawie obciążenia powierzchniowego
-    # (przyjmuję stałą szerokość belki, np. 1 m, dostosuj jeśli inne dane)
-    load_kg_m = load_kg_m2  # Przykładowe uproszczenie, dostosuj do rzeczywistych danych
+    # Pobieranie rozstawu fałd dla wybranej blachy
+    spacing_mm = BLACHY_ROZSTAWY[producent][blacha]
+
+    # Obliczenie obciążenia liniowego (kg/m) na podstawie obciążenia powierzchniowego i rozstawu fałd
+    load_kg_m = load_kg_m2 * (spacing_mm / 1000)  # Przeliczamy mm na m
 
     # Siły punktowe
     forces = []
@@ -42,8 +69,11 @@ def calculate():
     # Obliczenia dla obciążeń punktowych
     point_moment = np.zeros_like(x_values)
     for i, force in enumerate(forces):
-        a = distances[i]
-        moment = np.where(x_values <= a, force * (a - x_values), force * (L - x_values))
+        a = distances[i]  # Odległość od początku belki (już nie sumujemy)
+        # Reakcje w podporach
+        R_A = force * (L - a) / L  # Reakcja w lewej podporze
+        # Moment w punkcie x
+        moment = np.where(x_values <= a, R_A * x_values, R_A * x_values - force * (x_values - a))
         moment = np.where(x_values <= L, moment, 0)  # Upewniamy się, że moment jest 0 poza L
         point_moment += moment
     point_moment = -point_moment  # Odwrócenie wartości na ujemne
@@ -56,7 +86,7 @@ def calculate():
     max_continuous_moment_theoretical = (load_kg_m * L**2) / 8
 
     # Status
-    status = "Poprawne" if max_continuous_moment_theoretical > max_point_moment else "Niepoprawne"
+    status = "Podwieszenie jest poprawne" if max_continuous_moment_theoretical > max_point_moment else "Zbyt duże obciążenie, zmień podwieszenie"
 
     # Przygotowanie danych do przesłania
     response_data = {
@@ -67,7 +97,7 @@ def calculate():
         "forces": forces,
         "distances": distances,
         "load_kg_m": load_kg_m,
-        "spacing_mm": 337.0,  # Przykładowa wartość, dostosuj do swojego kodu
+        "spacing_mm": spacing_mm,
         "max_uniform_moment": float(max_uniform_moment),
         "max_point_moment": float(max_point_moment),
         "max_continuous_moment_theoretical": float(max_continuous_moment_theoretical),
