@@ -64,25 +64,30 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = 600; // Zachowana stała szerokość
-    const canvasHeight = 100; // Zachowana stała wysokość
-    const beamHeight = 20; // Zachowana wysokość belki
-    const supportWidth = 20; // Zachowana szerokość podpór
+    const canvasWidth = 600; // Stała szerokość
+    const canvasHeight = 100; // Stała wysokość
+    const beamHeight = 20; // Wysokość belki
+    const supportWidth = 20; // Szerokość podpór
 
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
     const pointBeamCanvas = document.getElementById("pointBeam");
-    uniformBeamCanvas.width = canvasWidth;
-    uniformBeamCanvas.height = canvasHeight;
-    pointBeamCanvas.width = canvasWidth;
-    pointBeamCanvas.height = canvasHeight;
+    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość dla ostrości
+    uniformBeamCanvas.height = canvasHeight * 2;
+    uniformBeamCanvas.style.width = `${canvasWidth}px`;
+    uniformBeamCanvas.style.height = `${canvasHeight}px`;
+    pointBeamCanvas.width = canvasWidth * 2;
+    pointBeamCanvas.height = canvasHeight * 2;
+    pointBeamCanvas.style.width = `${canvasWidth}px`;
+    pointBeamCanvas.style.height = `${canvasHeight}px`;
 
     // Belka - obciążenie równomierne
     let uniformCtx = uniformBeamCanvas.getContext("2d");
-    uniformCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    uniformCtx.clearRect(0, 0, canvasWidth * 2, canvasHeight * 2);
+    uniformCtx.scale(2, 2); // Skala dla ostrości
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
-    uniformCtx.lineWidth = 2;
+    uniformCtx.lineWidth = 1;
     uniformCtx.moveTo(supportWidth, canvasHeight / 2);
     uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     uniformCtx.moveTo(supportWidth - 10, canvasHeight / 2 + beamHeight);
@@ -97,9 +102,10 @@ function drawBeams(result) {
     uniformCtx.closePath();
     uniformCtx.fill();
     uniformCtx.stroke();
-    uniformCtx.font = "12px Arial";
+    uniformCtx.font = "12px Arial"; // Stały rozmiar fontu
     uniformCtx.fillStyle = "black";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 100, canvasHeight / 2 - beamHeight - 10);
+    uniformCtx.textAlign = "center";
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 5);
 
     // Wymiar całkowity
     uniformCtx.beginPath();
@@ -108,14 +114,15 @@ function drawBeams(result) {
     uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 15); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 20);
     uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 15); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 20);
     uniformCtx.stroke();
-    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 25);
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2, canvasHeight / 2 + 25);
 
     // Belka - obciążenia punktowe
     let pointCtx = pointBeamCanvas.getContext("2d");
-    pointCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    pointCtx.clearRect(0, 0, canvasWidth * 2, canvasHeight * 2);
+    pointCtx.scale(2, 2); // Skala dla ostrości
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
-    pointCtx.lineWidth = 2;
+    pointCtx.lineWidth = 1;
     pointCtx.moveTo(supportWidth, canvasHeight / 2);
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     pointCtx.moveTo(supportWidth - 10, canvasHeight / 2 + beamHeight);
@@ -143,8 +150,8 @@ function drawBeams(result) {
         pointCtx.lineTo(x + 5, canvasHeight / 2 + 15);
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
-        // Etykieta nad strzałką (nad belką)
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 - 10);
+        pointCtx.textAlign = "center";
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x, canvasHeight / 2 - 15); // Poprawiona pozycja i wyrównanie
     }
     pointCtx.stroke();
 
@@ -159,14 +166,14 @@ function drawBeams(result) {
         pointCtx.lineTo(x, canvasHeight / 2 + 25);
         pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
         pointCtx.moveTo(x, canvasHeight / 2 + 20); pointCtx.lineTo(x - 5, canvasHeight / 2 + 25); pointCtx.lineTo(x, canvasHeight / 2 + 30);
-        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, canvasHeight / 2 + 35);
+        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2, canvasHeight / 2 + 35);
         prevX = x;
     }
     pointCtx.moveTo(prevX, canvasHeight / 2 + 25);
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 25);
     pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
     pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 20); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 25); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 30);
-    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2 - 10, canvasHeight / 2 + 35);
+    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2, canvasHeight / 2 + 35);
     pointCtx.stroke();
 }
 
@@ -177,22 +184,25 @@ function drawCharts(result) {
 
     const L = result.L;
 
-    // Nowy wykres dla obciążenia równomiernego (od zera)
+    // Nowy wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
-    uniformCanvas.width = uniformCanvas.parentElement.clientWidth || 600; // Zachowanie responsywności
-    uniformCanvas.height = 300; // Zachowanie stałej wysokości
+    uniformCanvas.width = uniformCanvas.parentElement.clientWidth * 2 || 1200; // Podwójna rozdzielczość
+    uniformCanvas.height = 300 * 2; // Podwójna rozdzielczość
+    uniformCanvas.style.width = `${uniformCanvas.parentElement.clientWidth || 600}px`;
+    uniformCanvas.style.height = '300px';
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
             labels: result.x_values.map(x => x.toFixed(2)),
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.uniform_moment.map(m => ({ x: m, y: result.x_values[result.uniform_moment.indexOf(m)] })),
+                data: result.uniform_moment,
                 borderColor: 'blue',
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0,
-                tension: 0
+                tension: 0.1,
+                borderDash: [5, 5]
             }]
         },
         options: {
@@ -200,20 +210,6 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    type: 'linear',
-                    position: 'bottom',
-                    title: {
-                        display: true,
-                        text: 'Moment (kg·m)'
-                    },
-                    min: Math.min(...result.uniform_moment) * 1.2,
-                    max: 0,
-                    reverse: true,
-                    ticks: {
-                        stepSize: 10
-                    }
-                },
-                y: {
                     title: {
                         display: true,
                         text: 'Odległość (m)'
@@ -221,18 +217,44 @@ function drawCharts(result) {
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 5
+                        stepSize: L / 5,
+                        font: {
+                            size: 14 // Stały rozmiar fontu
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    beginAtZero: true,
+                    min: Math.min(...result.uniform_moment) * 1.2,
+                    max: 0,
+                    ticks: {
+                        stepSize: 10,
+                        font: {
+                            size: 14 // Stały rozmiar fontu
+                        }
                     }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.x.toFixed(2)} kg·m at ${context.raw.y.toFixed(2)} m`;
+                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
                         }
                     }
                 }
@@ -240,22 +262,25 @@ function drawCharts(result) {
         }
     });
 
-    // Nowy wykres dla obciążeń punktowych (od zera)
+    // Nowy wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
-    pointCanvas.width = pointCanvas.parentElement.clientWidth || 600; // Zachowanie responsywności
-    pointCanvas.height = 300; // Zachowanie stałej wysokości
+    pointCanvas.width = pointCanvas.parentElement.clientWidth * 2 || 1200; // Podwójna rozdzielczość
+    pointCanvas.height = 300 * 2; // Podwójna rozdzielczość
+    pointCanvas.style.width = `${pointCanvas.parentElement.clientWidth || 600}px`;
+    pointCanvas.style.height = '300px';
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
             labels: result.point_moment_x.map(x => x.toFixed(2)),
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.point_moment_values.map((m, i) => ({ x: m, y: result.point_moment_x[i] })),
+                data: result.point_moment_values,
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0,
-                tension: 0
+                tension: 0.1,
+                borderDash: [5, 5]
             }]
         },
         options: {
@@ -263,20 +288,6 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    type: 'linear',
-                    position: 'bottom',
-                    title: {
-                        display: true,
-                        text: 'Moment (kg·m)'
-                    },
-                    min: Math.min(...result.point_moment_values) * 1.2,
-                    max: 0,
-                    reverse: true,
-                    ticks: {
-                        stepSize: 10
-                    }
-                },
-                y: {
                     title: {
                         display: true,
                         text: 'Odległość (m)'
@@ -284,18 +295,44 @@ function drawCharts(result) {
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 5
+                        stepSize: L / 5,
+                        font: {
+                            size: 14 // Stały rozmiar fontu
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    beginAtZero: true,
+                    min: Math.min(...result.point_moment_values) * 1.2,
+                    max: 0,
+                    ticks: {
+                        stepSize: 10,
+                        font: {
+                            size: 14 // Stały rozmiar fontu
+                        }
                     }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
                 },
                 tooltip: {
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.x.toFixed(2)} kg·m at ${context.raw.y.toFixed(2)} m`;
+                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
                         }
                     }
                 }
