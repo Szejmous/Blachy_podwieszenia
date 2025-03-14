@@ -9,14 +9,36 @@ const BLACHY = {
 
 document.addEventListener("DOMContentLoaded", function () {
     let forcesDiv = document.getElementById("forces-inputs");
-    for (let i = 1; i <= 6; i++) {
-        forcesDiv.innerHTML += `
+    forcesDiv.innerHTML = `
+        <div class="forces-row">
             <div>
-                <label class="force-label">P${i} (kg): <input id="P${i}" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
-                <label class="distance-label">x${i} (m): <input id="x${i}" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="force-label">P1 (kg): <input id="P1" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x1 (m): <input id="x1" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
             </div>
-        `;
-    }
+            <div>
+                <label class="force-label">P2 (kg): <input id="P2" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x2 (m): <input id="x2" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P3 (kg): <input id="P3" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x3 (m): <input id="x3" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+        </div>
+        <div class="forces-row">
+            <div>
+                <label class="force-label">P4 (kg): <input id="P4" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x4 (m): <input id="x4" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P5 (kg): <input id="P5" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x5 (m): <input id="x5" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P6 (kg): <input id="P6" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x6 (m): <input id="x6" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+        </div>
+    `;
     updateBlachy(); // Wypełnij początkowo listę blach
     calculate(); // Wykonaj obliczenia przy załadowaniu strony
 });
@@ -57,7 +79,10 @@ async function calculate() {
     let result = await response.json();
     let resultSpan = document.getElementById("result");
     resultSpan.innerText = result.status;
-    resultSpan.style.color = result.status.includes("Poprawne") ? "green" : "red";
+    resultSpan.style.color = result.status.includes("poprawne") ? "green" : "red";
+
+    // Aktualizacja nagłówka z obciążeniem ciągłym
+    document.getElementById("uniform-load-heading").innerText = `Fałda obciążona obciążeniem ciągłym (q = ${result.load_kg_m.toFixed(2)} kg/m)`;
 
     // Usuń istniejące span-y, aby uniknąć duplikatów
     const uniformContainer = document.querySelector('#uniformMomentChart').parentElement;
@@ -68,13 +93,13 @@ async function calculate() {
     // Wyświetlanie maksymalnych wartości z kolorami
     const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
     const maxUniformSpan = document.createElement("span");
-    maxUniformSpan.innerText = `Max Moment (równomierne): ${result.max_uniform_moment.toFixed(2)} kg·m`;
+    maxUniformSpan.innerText = `Max Moment (równomierne): ${Math.abs(result.max_uniform_moment).toFixed(2)} kg·m`;
     maxUniformSpan.style.color = isWithinLimits ? "green" : "red";
     maxUniformSpan.style.fontWeight = "bold";
     uniformContainer.insertBefore(maxUniformSpan, uniformContainer.firstChild);
 
     const maxPointSpan = document.createElement("span");
-    maxPointSpan.innerText = `Max Moment (punktowe): ${result.max_point_moment.toFixed(2)} kg·m`;
+    maxPointSpan.innerText = `Max Moment (punktowe): ${Math.abs(result.max_point_moment).toFixed(2)} kg·m`;
     maxPointSpan.style.color = isWithinLimits ? "green" : "red";
     maxPointSpan.style.fontWeight = "bold";
     pointContainer.insertBefore(maxPointSpan, pointContainer.firstChild);
@@ -188,7 +213,7 @@ function drawBeams(result) {
         prevX = x;
     }
     pointCtx.moveTo(prevX, canvasHeight / 2 + 25);
-    pointCtx.lineTo(canvasWidth - ** supportWidth, canvasHeight / 2 + 25);
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 25);
     pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
     pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 20); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 25); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 30);
     pointCtx.fillText(`${L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)} m`, (prevX + canvasWidth - supportWidth) / 2, canvasHeight / 2 + 35);
@@ -201,11 +226,10 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const xLabels = result.x_values.map(x => x.toFixed(2)); // Etykiety osi X
-    
-console.log("xLabels:", xLabels);
-console.log("point_moment_values:", result.point_moment_values);
-    
+    const xValues = result.x_values;
+    console.log("xValues:", xValues);
+    console.log("point_moment_values:", result.point_moment_values);
+
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
     uniformCanvas.style.width = '100%';
@@ -213,10 +237,12 @@ console.log("point_moment_values:", result.point_moment_values);
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
-            labels: xLabels,
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.uniform_moment,
+                data: result.uniform_moment.map((moment, index) => ({
+                    x: xValues[index],
+                    y: moment  // Wartości są już ujemne z app.py
+                })),
                 borderColor: 'blue',
                 borderWidth: 2,
                 fill: false,
@@ -228,21 +254,26 @@ console.log("point_moment_values:", result.point_moment_values);
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 10, // Krok na osi X
-                        font: { size: 14 }
+                        stepSize: 0.1,  // Etykiety co 0.1 m
+                        font: { size: 10 },  // Mniejszy font, bo etykiety będą gęste
+                        maxTicksLimit: 20,  // Ograniczenie liczby etykiet, aby uniknąć nakładania
+                        callback: function(value) {
+                            return value.toFixed(1);
+                        }
                     }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment, 0) * 1.2 || -10,
-                    max: Math.max(...result.uniform_moment, 0) * 1.2 || 10,
+                    min: Math.min(...result.uniform_moment) * 1.2 || 0,  // Ujemne wartości w dół
+                    max: 0,  // Górna granica na 0
                     ticks: {
-                        stepSize: Math.abs(Math.max(...result.uniform_moment, 0) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,  // Krok dla ujemnych wartości
                         font: { size: 14 }
                     }
                 }
@@ -253,7 +284,7 @@ console.log("point_moment_values:", result.point_moment_values);
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
+                            return `Moment: ${Math.abs(context.parsed.y).toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
@@ -268,10 +299,12 @@ console.log("point_moment_values:", result.point_moment_values);
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
-            labels: xLabels,
             datasets: [{
                 label: 'Moment (kg·m)',
-                data: result.point_moment_values,
+                data: result.point_moment_values.map((moment, index) => ({
+                    x: xValues[index],
+                    y: moment  // Wartości są już ujemne z app.py
+                })),
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: false,
@@ -283,21 +316,26 @@ console.log("point_moment_values:", result.point_moment_values);
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 10, // Krok na osi X
-                        font: { size: 14 }
+                        stepSize: 0.1,  // Etykiety co 0.1 m
+                        font: { size: 10 },  // Mniejszy font, bo etykiety będą gęste
+                        maxTicksLimit: 20,  // Ograniczenie liczby etykiet, aby uniknąć nakładania
+                        callback: function(value) {
+                            return value.toFixed(1);
+                        }
                     }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values, 0) * 1.2 || -10,
-                    max: Math.max(...result.point_moment_values, 0) * 1.2 || 10,
+                    min: Math.min(...result.point_moment_values) * 1.2 || 0,  // Ujemne wartości w dół
+                    max: 0,  // Górna granica na 0
                     ticks: {
-                        stepSize: Math.abs(Math.max(...result.point_moment_values, 0) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,  // Krok dla ujemnych wartości
                         font: { size: 14 }
                     }
                 }
@@ -308,7 +346,7 @@ console.log("point_moment_values:", result.point_moment_values);
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.raw.toFixed(2)} kg·m at ${context.label} m`;
+                            return `Moment: ${Math.abs(context.parsed.y).toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
