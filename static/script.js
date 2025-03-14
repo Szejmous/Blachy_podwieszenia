@@ -202,12 +202,12 @@ function drawCharts(result) {
 
     const L = result.L;
     const xLabels = result.x_values.map(x => x.toFixed(1)); // Etykiety co L/10
-    console.log("xLabels:", xLabels); // Diagnostyka: wyświetl xLabels w konsoli
-    console.log("point_moment_values:", result.point_moment_values); // Diagnostyka: wyświetl momenty punktowe
+    console.log("xLabels:", xLabels); // Diagnostyka
+    console.log("point_moment_values:", result.point_moment_values); // Diagnostyka
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
-    uniformCanvas.style.width = '100%';
+    uniformCanvas.style.width = '100%'; // Upewnij się, że canvas dostosowuje się do kontenera
     uniformCanvas.style.height = '100%';
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
@@ -230,7 +230,13 @@ function drawCharts(result) {
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: L / 10, font: { size: 14 } }
+                    ticks: {
+                        stepSize: L / 10,
+                        font: { size: 14 },
+                        callback: function(value, index, values) {
+                            return xLabels[index]; // Upewnij się, że etykiety są zgodne z xLabels
+                        }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
@@ -259,7 +265,7 @@ function drawCharts(result) {
 
     // Wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
-    pointCanvas.style.width = '100%';
+    pointCanvas.style.width = '100%'; // Upewnij się, że canvas dostosowuje się do kontenera
     pointCanvas.style.height = '100%';
     pointChart = new Chart(pointCanvas, {
         type: 'line',
@@ -282,7 +288,13 @@ function drawCharts(result) {
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: L / 10, font: { size: 14 } }
+                    ticks: {
+                        stepSize: L / 10,
+                        font: { size: 14 },
+                        callback: function(value, index, values) {
+                            return xLabels[index]; // Upewnij się, że etykiety są zgodne z xLabels
+                        }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
