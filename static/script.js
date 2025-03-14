@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
     }
-    updateBlachy(); // Wypełnij początkowo listę blach
+    updateBlachy(); // Wypełnij początko2wo listę blach
     calculate(); // Wykonaj obliczenia przy załadowaniu strony
 });
 
