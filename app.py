@@ -50,45 +50,39 @@ def calculate():
         return jsonify({"status": "Błąd: Pozycje sił muszą być w zakresie [0, L]"})
 
     # Obliczenia dla obciążenia równomiernego
-    num_points = 100  # Zwiększamy liczbę punktów dla płynniejszych wykresów
-    x_values = np.linspace(0, L, num_points)  # Punkty od 0 do L
+    x_step = L / 10  # Krok co L/10
+    x_values = np.arange(0, L + x_step, x_step)  # Punkty od 0 do L z krokiem L/10
     uniform_moment = []
-    # Reakcje w podporach dla obciążenia równomiernego (symetryczne)
-    R_A_uniform = load_kg_m * L / 2  # Reakcja w A
-    R_B_uniform = R_A_uniform  # Reakcja w B
+    R_A = load_kg_m * L / 2  # Reakcja w A (symetryczne obciążenie)
+    R_B = R_A  # Reakcja w B
     for x in x_values:
-        # Siła ścinająca V(x) = R_A - q*x
-        V = R_A_uniform - load_kg_m * x
-        # Moment zginający M(x) = R_A*x - q*x^2/2
-        M = R_A_uniform * x - (load_kg_m * x * x) / 2
+        # Moment zginający dla obciążenia równomiernego: M(x) = R_A * x - q * x^2 / 2
+        M = R_A * x - (load_kg_m * x * x) / 2
         uniform_moment.append(M)
 
     # Obliczenia dla obciążeń punktowych
     total_force = sum(forces)
     if total_force > 0:
-        # Obliczanie reakcji w podporach (metoda równowagi momentów)
-        # Suma momentów względem punktu A = 0
-        sum_moments_A = sum(f * d for f, d in zip(forces, absolute_distances[1:]))
-        R_B_point = sum_moments_A / L  # Reakcja w B
-        R_A_point = total_force - R_B_point  # Reakcja w A
+        # Obliczanie reakcji w podporach (metoda równowagi momentów względem B)
+        sum_moments_B = sum(f * (L - d) for f, d in zip(forces, absolute_distances[1:]))
+        R_A = sum_moments_B / L  # Reakcja w A
+        R_B = total_force - R_A  # Reakcja w B
     else:
-        R_A_point = R_B_point = 0
+        R_A = R_B = 0
 
     point_moment_values = []
     for x in x_values:
-        # Moment zginający od reakcji w A
-        M = R_A_point * x
+        M = R_A * x  # Składnik od reakcji w A
         # Dodajemy wpływ sił punktowych
         for f, d in zip(forces, absolute_distances[1:]):
             if x >= d:
-                M -= f * (x - d)
+                M -= f * (x - d)  # Moment od siły punktowej
         point_moment_values.append(M)
 
     # Maksymalne wartości momentów
     max_uniform_moment = max(uniform_moment) if uniform_moment else 0
     max_point_moment = max(point_moment_values) if point_moment_values else 0
-    # Teoretyczny maksymalny moment dla obciążenia równomiernego (w środku belki)
-    max_continuous_moment_theoretical = (load_kg_m * L * L) / 8
+    max_continuous_moment_theoretical = (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
     return jsonify({
         "status": "Poprawne obliczenia",
