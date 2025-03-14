@@ -35,26 +35,31 @@ def calculate():
     forces = [f for f in forces if f > 0]  # Usuń zera
     distances = [d for d, f in zip(distances, forces) if f > 0]  # Usuń zera
 
+    # Obliczanie pozycji jako sumy przyrostów
+    absolute_distances = []
+    current_pos = 0
+    for d in distances:
+        current_pos += d
+        absolute_distances.append(current_pos)
+
     # Walidacja danych
     if L <= 0:
         return jsonify({"status": "Błąd: Rozpiętość belki musi być większa od 0"})
-    if any(d < 0 or d > L for d in distances):
+    if any(d < 0 or d > L for d in absolute_distances):
         return jsonify({"status": "Błąd: Pozycje sił muszą być w zakresie [0, L]"})
-    if any(d1 >= d2 for d1, d2 in zip(distances, distances[1:])):
-        return jsonify({"status": "Błąd: Pozycje sił muszą być rosnące"})
 
     # Obliczenia dla obciążenia równomiernego
     x_values = np.arange(0, L + 0.1, 0.1)  # Dokładny zakres od 0 do L z krokiem 0.1 m
     uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
 
     # Obliczenia dla obciążeń punktowych
-    R_A = sum(f * (L - d) for f, d in zip(forces, distances)) / L  # Reakcja w A
-    R_B = sum(f * d for f, d in zip(forces, distances)) / L  # Reakcja w B
-    point_moment_x = [0] + distances + [L]  # Kluczowe punkty: 0, miejsca sił, L
+    R_A = sum(f * (L - d) for f, d in zip(forces, absolute_distances)) / L  # Reakcja w A
+    R_B = sum(f * d for f, d in zip(forces, absolute_distances)) / L  # Reakcja w B
+    point_moment_x = [0] + absolute_distances + [L]  # Kluczowe punkty: 0, miejsca sił, L
     point_moment_values = []
     for x in point_moment_x:
         M = R_A * x
-        for f, d in zip(forces, distances):
+        for f, d in zip(forces, absolute_distances):
             if x > d:
                 M -= f * (x - d)
         point_moment_values.append(-M)  # Ujemne wartości zgodnie z konwencją
@@ -74,7 +79,7 @@ def calculate():
         "point_moment_x": point_moment_x,
         "point_moment_values": point_moment_values,
         "forces": forces,
-        "distances": distances,
+        "distances": absolute_distances,  # Zwracamy absolutne pozycje
         "max_uniform_moment": max_uniform_moment,
         "max_point_moment": max_point_moment,
         "max_continuous_moment_theoretical": max_continuous_moment_theoretical
