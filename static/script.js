@@ -64,10 +64,10 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = 600; // Bazowa szerokość
-    const canvasHeight = 100; // Stała wysokość dla belek
-    const beamHeight = 20; // Wysokość belki
-    const supportWidth = 20; // Szerokość podpór
+    const canvasWidth = 600; // Zachowana stała szerokość
+    const canvasHeight = 100; // Zachowana stała wysokość
+    const beamHeight = 20; // Zachowana wysokość belki
+    const supportWidth = 20; // Zachowana szerokość podpór
 
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
@@ -83,32 +83,32 @@ function drawBeams(result) {
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
     uniformCtx.lineWidth = 2;
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2);
     uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
-    uniformCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
-    uniformCtx.lineTo(supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
+    uniformCtx.moveTo(supportWidth - 10, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(supportWidth + 10, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(supportWidth, canvasHeight / 2);
     uniformCtx.closePath();
     uniformCtx.fillStyle = "black";
     uniformCtx.fill();
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Prawa podpora (trójkąt w dół)
-    uniformCtx.lineTo(canvasWidth - supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
-    uniformCtx.lineTo(canvasWidth - supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
+    uniformCtx.moveTo(canvasWidth - supportWidth - 10, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     uniformCtx.closePath();
     uniformCtx.fill();
     uniformCtx.stroke();
     uniformCtx.font = "12px Arial";
     uniformCtx.fillStyle = "black";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 100, canvasHeight / 2 - 10);
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 100, canvasHeight / 2 - beamHeight - 10);
 
     // Wymiar całkowity
     uniformCtx.beginPath();
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 5);
-    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 5);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 5); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 10);
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 5); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 10);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 15);
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 15);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 15); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 20);
+    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 15); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 20);
     uniformCtx.stroke();
-    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 15);
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 25);
 
     // Belka - obciążenia punktowe
     let pointCtx = pointBeamCanvas.getContext("2d");
@@ -116,17 +116,17 @@ function drawBeams(result) {
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
     pointCtx.lineWidth = 2;
-    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
+    pointCtx.moveTo(supportWidth, canvasHeight / 2);
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
-    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
-    pointCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
-    pointCtx.lineTo(supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
+    pointCtx.moveTo(supportWidth - 10, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(supportWidth + 10, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(supportWidth, canvasHeight / 2);
     pointCtx.closePath();
     pointCtx.fillStyle = "black";
     pointCtx.fill();
-    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Prawa podpora (trójkąt w dół)
-    pointCtx.lineTo(canvasWidth - supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
-    pointCtx.lineTo(canvasWidth - supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
+    pointCtx.moveTo(canvasWidth - supportWidth - 10, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     pointCtx.closePath();
     pointCtx.fill();
     pointCtx.stroke();
@@ -136,11 +136,11 @@ function drawBeams(result) {
         let x = supportWidth + (result.distances[i] / L) * (canvasWidth - 2 * supportWidth);
         pointCtx.strokeStyle = "blue";
         pointCtx.beginPath();
-        pointCtx.moveTo(x, canvasHeight / 2); // Początek strzałki
-        pointCtx.lineTo(x, canvasHeight / 2 + 20); // W dół
-        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15); // Lewa część grotu
+        pointCtx.moveTo(x, canvasHeight / 2);
+        pointCtx.lineTo(x, canvasHeight / 2 + 20);
+        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15);
         pointCtx.moveTo(x, canvasHeight / 2 + 20);
-        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15); // Prawa część grotu
+        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15);
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
         // Etykieta nad strzałką (nad belką)
@@ -176,27 +176,23 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const canvasWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600;
-    const canvasHeight = 300; // Stała wysokość dla wykresów
 
-    // Ustawienie wymiarów canvasów
-    document.getElementById('uniformMomentChart').width = canvasWidth;
-    document.getElementById('uniformMomentChart').height = canvasHeight;
-    document.getElementById('pointMomentChart').width = canvasWidth;
-    document.getElementById('pointMomentChart').height = canvasHeight;
-
-    // Nowy wykres dla obciążenia równomiernego
-    uniformChart = new Chart(document.getElementById('uniformMomentChart'), {
+    // Nowy wykres dla obciążenia równomiernego (od zera)
+    const uniformCanvas = document.getElementById('uniformMomentChart');
+    uniformCanvas.width = uniformCanvas.parentElement.clientWidth || 600; // Zachowanie responsywności
+    uniformCanvas.height = 300; // Zachowanie stałej wysokości
+    uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
             labels: result.x_values.map(x => x.toFixed(2)),
             datasets: [{
-                label: 'Moment od obciążenia równomiernego (kg·m)',
-                data: result.uniform_moment,
+                label: 'Moment (kg·m)',
+                data: result.uniform_moment.map(m => ({ x: m, y: result.x_values[result.uniform_moment.indexOf(m)] })),
                 borderColor: 'blue',
                 borderWidth: 2,
                 fill: false,
-                pointRadius: 0
+                pointRadius: 0,
+                tension: 0
             }]
         },
         options: {
@@ -204,6 +200,20 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    min: Math.min(...result.uniform_moment) * 1.2,
+                    max: 0,
+                    reverse: true,
+                    ticks: {
+                        stepSize: 10
+                    }
+                },
+                y: {
                     title: {
                         display: true,
                         text: 'Odległość (m)'
@@ -213,19 +223,6 @@ function drawCharts(result) {
                     ticks: {
                         stepSize: L / 5
                     }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Moment (kg·m)'
-                    },
-                    beginAtZero: false,
-                    reverse: true,
-                    min: Math.min(...result.uniform_moment) * 1.2, // Margines dla czytelności
-                    max: 0,
-                    ticks: {
-                        stepSize: 10
-                    }
                 }
             },
             plugins: {
@@ -233,25 +230,32 @@ function drawCharts(result) {
                     position: 'top'
                 },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false
+                    callbacks: {
+                        label: function(context) {
+                            return `Moment: ${context.raw.x.toFixed(2)} kg·m at ${context.raw.y.toFixed(2)} m`;
+                        }
+                    }
                 }
             }
         }
     });
 
-    // Nowy wykres dla obciążeń punktowych
-    pointChart = new Chart(document.getElementById('pointMomentChart'), {
+    // Nowy wykres dla obciążeń punktowych (od zera)
+    const pointCanvas = document.getElementById('pointMomentChart');
+    pointCanvas.width = pointCanvas.parentElement.clientWidth || 600; // Zachowanie responsywności
+    pointCanvas.height = 300; // Zachowanie stałej wysokości
+    pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
             labels: result.point_moment_x.map(x => x.toFixed(2)),
             datasets: [{
-                label: 'Moment od sił punktowych (kg·m)',
-                data: result.point_moment_values,
+                label: 'Moment (kg·m)',
+                data: result.point_moment_values.map((m, i) => ({ x: m, y: result.point_moment_x[i] })),
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: false,
-                pointRadius: 0
+                pointRadius: 0,
+                tension: 0
             }]
         },
         options: {
@@ -259,6 +263,20 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    min: Math.min(...result.point_moment_values) * 1.2,
+                    max: 0,
+                    reverse: true,
+                    ticks: {
+                        stepSize: 10
+                    }
+                },
+                y: {
                     title: {
                         display: true,
                         text: 'Odległość (m)'
@@ -268,19 +286,6 @@ function drawCharts(result) {
                     ticks: {
                         stepSize: L / 5
                     }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Moment (kg·m)'
-                    },
-                    beginAtZero: false,
-                    reverse: true,
-                    min: Math.min(...result.point_moment_values) * 1.2, // Margines dla czytelności
-                    max: 0,
-                    ticks: {
-                        stepSize: 10
-                    }
                 }
             },
             plugins: {
@@ -288,8 +293,11 @@ function drawCharts(result) {
                     position: 'top'
                 },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false
+                    callbacks: {
+                        label: function(context) {
+                            return `Moment: ${context.raw.x.toFixed(2)} kg·m at ${context.raw.y.toFixed(2)} m`;
+                        }
+                    }
                 }
             }
         }
