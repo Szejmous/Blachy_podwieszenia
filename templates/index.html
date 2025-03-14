@@ -10,21 +10,21 @@
 <body>
     <h1>Kalkulator Belki</h1>
 
-    <div>
-        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20"></label><br>
+    <div class="input-container">
+        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label><br>
         <label>Producent blachy:
-            <select id="producent" onchange="updateBlachy()">
+            <select id="producent" onchange="updateBlachy(); calculate()">
                 {% for producent in producenci %}
                     <option value="{{ producent }}" {% if producent == "Pruszyński" %}selected{% endif %}>{{ producent }}</option>
                 {% endfor %}
             </select>
         </label><br>
         <label>Model blachy:
-            <select id="blacha">
+            <select id="blacha" onchange="calculate()">
                 <!-- Opcje zostaną wypełnione przez JavaScript -->
             </select>
         </label><br>
-        <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6"></label>
+        <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6" onchange="calculate()" oninput="calculate()"></label>
     </div>
 
     <h2>Siły punktowe</h2>
