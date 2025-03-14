@@ -201,6 +201,8 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
+    // Ujednolicony krok na osi X (np. co 1 m)
+    const xStep = Math.ceil(L / 5); // Dzielimy belkę na 5 części
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
@@ -229,9 +231,9 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L, // Upewnienie się, że zakres jest od 0 do L
+                    max: L,
                     ticks: {
-                        stepSize: 0.5, // Dostosowany krok dla lepszej widoczności
+                        stepSize: xStep, // Ujednolicony krok
                         font: {
                             size: 14
                         }
@@ -243,8 +245,8 @@ function drawCharts(result) {
                         text: 'Moment [kg·m]'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment) * 1.2 || -10, // Dynamiczne minimum z marginesem
-                    max: 0, // Górna granica to 0
+                    min: Math.min(...result.uniform_moment) * 1.2 || -10,
+                    max: 0,
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,
                         font: {
@@ -305,7 +307,7 @@ function drawCharts(result) {
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 5,
+                        stepSize: xStep, // Ujednolicony krok
                         font: {
                             size: 14
                         }
@@ -317,8 +319,8 @@ function drawCharts(result) {
                         text: 'Moment [kg·m]'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values) * 1.2 || -10, // Dynamiczne minimum z marginesem
-                    max: 0, // Górna granica to 0
+                    min: Math.min(...result.point_moment_values) * 1.2 || -10,
+                    max: 0,
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,
                         font: {
