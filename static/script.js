@@ -64,32 +64,36 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = document.getElementById("uniformBeam").offsetWidth || 600;
+    const canvasWidth = 600; // Stała szerokość canvasu
     const canvasHeight = 100; // Stała wysokość dla belek
     const beamHeight = 20; // Stała wysokość belki
     const supportWidth = 20; // Stała szerokość podpór
 
     // Ustawienie wymiarów canvasu
-    document.getElementById("uniformBeam").height = canvasHeight;
-    document.getElementById("pointBeam").height = canvasHeight;
+    const uniformBeamCanvas = document.getElementById("uniformBeam");
+    const pointBeamCanvas = document.getElementById("pointBeam");
+    uniformBeamCanvas.width = canvasWidth;
+    uniformBeamCanvas.height = canvasHeight;
+    pointBeamCanvas.width = canvasWidth;
+    pointBeamCanvas.height = canvasHeight;
 
     // Belka - obciążenie równomierne
-    let uniformCtx = document.getElementById("uniformBeam").getContext("2d");
+    let uniformCtx = uniformBeamCanvas.getContext("2d");
     uniformCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
     uniformCtx.lineWidth = 2;
     uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Podpora lewa (trójkąt)
+    uniformCtx.moveTo(supportWidth - 10, canvasHeight / 2 - beamHeight); // Podpora lewa (trójkąt, wierzchołek na górze)
     uniformCtx.lineTo(supportWidth + 10, canvasHeight / 2 - beamHeight);
-    uniformCtx.lineTo(supportWidth - 10, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(supportWidth, canvasHeight / 2);
     uniformCtx.closePath();
     uniformCtx.fillStyle = "black";
     uniformCtx.fill();
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Podpora prawa (trójkąt)
+    uniformCtx.moveTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight); // Podpora prawa (trójkąt, wierzchołek na górze)
     uniformCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - beamHeight);
-    uniformCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     uniformCtx.closePath();
     uniformCtx.fill();
     uniformCtx.stroke();
@@ -106,22 +110,22 @@ function drawBeams(result) {
     uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 20);
 
     // Belka - obciążenia punktowe
-    let pointCtx = document.getElementById("pointBeam").getContext("2d");
+    let pointCtx = pointBeamCanvas.getContext("2d");
     pointCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
     pointCtx.lineWidth = 2;
     pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
-    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Podpora lewa (trójkąt)
+    pointCtx.moveTo(supportWidth - 10, canvasHeight / 2 - beamHeight); // Podpora lewa (trójkąt, wierzchołek na górze)
     pointCtx.lineTo(supportWidth + 10, canvasHeight / 2 - beamHeight);
-    pointCtx.lineTo(supportWidth - 10, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(supportWidth, canvasHeight / 2);
     pointCtx.closePath();
     pointCtx.fillStyle = "black";
     pointCtx.fill();
-    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Podpora prawa (trójkąt)
+    pointCtx.moveTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight); // Podpora prawa (trójkąt, wierzchołek na górze)
     pointCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - beamHeight);
-    pointCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     pointCtx.closePath();
     pointCtx.fill();
     pointCtx.stroke();
@@ -182,7 +186,12 @@ function drawCharts(result) {
             }]
         },
         options: {
-            scales: { y: { beginAtZero: true }, x: { title: { display: true, text: 'Odległość (m)' } } },
+            maintainAspectRatio: false, // Wyłącz responsywność aspektu
+            responsive: false, // Wyłącz responsywność szerokości
+            scales: { 
+                y: { beginAtZero: true, title: { display: true, text: 'Moment (kg·m)' } },
+                x: { title: { display: true, text: 'Odległość (m)' } }
+            },
             plugins: {
                 annotation: {
                     annotations: [{
@@ -221,7 +230,12 @@ function drawCharts(result) {
             }]
         },
         options: {
-            scales: { y: { beginAtZero: true }, x: { title: { display: true, text: 'Odległość (m)' } } },
+            maintainAspectRatio: false, // Wyłącz responsywność aspektu
+            responsive: false, // Wyłącz responsywność szerokości
+            scales: { 
+                y: { beginAtZero: true, title: { display: true, text: 'Moment (kg·m)' } },
+                x: { title: { display: true, text: 'Odległość (m)' } }
+            },
             plugins: {
                 annotation: {
                     annotations: result.moment_values.map((m, i) => ({
