@@ -59,6 +59,26 @@ async function calculate() {
     resultSpan.innerText = result.status;
     resultSpan.style.color = result.status.includes("Poprawne") ? "green" : "red";
 
+    // Usuń istniejące span-y, aby uniknąć duplikatów
+    const uniformContainer = document.querySelector('#uniformMomentChart').parentElement;
+    const pointContainer = document.querySelector('#pointMomentChart').parentElement;
+    uniformContainer.querySelectorAll('span').forEach(span => span.remove());
+    pointContainer.querySelectorAll('span').forEach(span => span.remove());
+
+    // Wyświetlanie maksymalnych wartości z kolorami
+    const maxUniformSpan = document.createElement("span");
+    const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
+    maxUniformSpan.innerText = `Max Moment (równomierne): ${result.max_uniform_moment.toFixed(2)} kg·m`;
+    maxUniformSpan.style.color = isWithinLimits ? "green" : "red";
+    maxUniformSpan.style.fontWeight = "bold";
+    uniformContainer.insertBefore(maxUniformSpan, uniformContainer.firstChild);
+
+    const maxPointSpan = document.createElement("span");
+    maxPointSpan.innerText = `Max Moment (punktowe): ${result.max_point_moment.toFixed(2)} kg·m`;
+    maxPointSpan.style.color = isWithinLimits ? "green" : "red";
+    maxPointSpan.style.fontWeight = "bold";
+    pointContainer.insertBefore(maxPointSpan, pointContainer.firstChild);
+
     drawBeams(result);
     drawCharts(result);
 }
@@ -72,7 +92,7 @@ function drawBeams(result) {
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
     const pointBeamCanvas = document.getElementById("pointBeam");
-    uniformBeamCanvas.width = canvasWidth; // Usunięto podwójną rozdzielczość
+    uniformBeamCanvas.width = canvasWidth;
     uniformBeamCanvas.height = canvasHeight;
     uniformBeamCanvas.style.width = `${canvasWidth}px`;
     uniformBeamCanvas.style.height = `${canvasHeight}px`;
@@ -209,9 +229,9 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L,
+                    max: L, // Upewnienie się, że zakres jest od 0 do L
                     ticks: {
-                        stepSize: L / 5,
+                        stepSize: 0.5, // Dostosowany krok dla lepszej widoczności
                         font: {
                             size: 14
                         }
@@ -224,7 +244,7 @@ function drawCharts(result) {
                     },
                     beginAtZero: true,
                     min: Math.min(...result.uniform_moment) * 1.2 || -10, // Dynamiczne minimum z marginesem
-                    max: 0, // Momenty są ujemne, więc górna granica to 0
+                    max: 0, // Górna granica to 0
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,
                         font: {
@@ -298,7 +318,7 @@ function drawCharts(result) {
                     },
                     beginAtZero: true,
                     min: Math.min(...result.point_moment_values) * 1.2 || -10, // Dynamiczne minimum z marginesem
-                    max: 0, // Momenty są ujemne, więc górna granica to 0
+                    max: 0, // Górna granica to 0
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,
                         font: {
