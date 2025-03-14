@@ -11,19 +11,21 @@ h1, h2, h3 {
     color: #333;
 }
 
-canvas {
-    width: 100%; /* Responsywność */
+/* Kontener dla wykresów */
+.chart-container {
+    width: 100%;
     max-width: 600px; /* Maksymalna szerokość */
+    height: 300px; /* Stała wysokość ramki */
     margin-top: 10px;
+    position: relative; /* Umożliwia pozycjonowanie canvasu */
+}
+
+canvas {
+    width: 100%; /* Pełna szerokość w kontenerze */
+    height: 100%; /* Pełna wysokość w kontenerze */
     border: 1px solid #ccc;
     background-color: #fff;
     display: block;
-}
-
-/* Usunięto sztywne ustawienie height i width dla wykresów */
-#uniformMomentChart, #pointMomentChart {
-    width: 100% !important; /* Responsywność */
-    max-width: 600px;
 }
 
 .input-container {
