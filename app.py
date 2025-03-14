@@ -14,6 +14,7 @@ def calculate():
     # Dane wejściowe
     load_kg_m2 = float(data["load_kg_m2"])
     spacing_mm = float(data["spacing_mm"]) / 1000  # Konwersja na metry
+    L = float(data["beam_span"])  # Rozpiętość belki w metrach
 
     # Obciążenie na fałdę (kg/m)
     load_kg_m = load_kg_m2 * spacing_mm
@@ -32,21 +33,20 @@ def calculate():
     cumulative_distances = [0]
     for i, x in enumerate(distances):
         cumulative_distances.append(cumulative_distances[-1] + x)
-    cumulative_distances.pop(0)  # Usuń początkowe 0
-
-    L = max(cumulative_distances) if cumulative_distances else 1  # Długość belki
+    cumulative_distances.pop(0)
 
     # Moment maksymalny od obciążenia równomiernego (ql²/8)
     max_moment_uniform = (load_kg_m * L**2) / 8
 
-    # Wykres momentów od obciążenia równomiernego
-    uniform_moment = [0, max_moment_uniform / 2, max_moment_uniform, max_moment_uniform / 2, 0]
+    # Dokładniejszy wykres momentów od obciążenia równomiernego (parabola)
+    x_values = np.linspace(0, L, 50)
+    uniform_moment = [load_kg_m * x * (L - x) / 2 for x in x_values]
 
     # Moment od sił punktowych
     moment_values = []
     for i, P in enumerate(forces):
         x = cumulative_distances[i]
-        moment = P * x * (L - x) / L  # Moment w punkcie siły
+        moment = P * x * (L - x) / L
         moment_values.append(moment)
 
     max_moment_forces = max(moment_values) if moment_values else 0
@@ -58,7 +58,8 @@ def calculate():
         "load_kg_m": load_kg_m,
         "L": L,
         "max_moment_uniform": max_moment_uniform,
-        "uniform_moment": uniform_moment,
+        "uniform_moment": uniform_moment.tolist(),
+        "x_values": x_values.tolist(),
         "forces": forces,
         "distances": cumulative_distances,
         "moment_values": moment_values,
