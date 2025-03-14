@@ -231,7 +231,7 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L,
+                    max: L, // Pełny zakres od 0 do L
                     ticks: {
                         stepSize: xStep, // Ujednolicony krok
                         font: {
@@ -285,7 +285,7 @@ function drawCharts(result) {
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
-            labels: result.point_moment_x.map(x => x.toFixed(2)),
+            labels: result.point_moment_x.map(x => x.toFixed(2)), // Używamy rzeczywistych pozycji
             datasets: [{
                 label: 'Moment (kg·m)',
                 data: result.point_moment_values,
@@ -305,7 +305,7 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L,
+                    max: L, // Pełny zakres od 0 do L
                     ticks: {
                         stepSize: xStep, // Ujednolicony krok
                         font: {
