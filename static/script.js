@@ -66,8 +66,8 @@ async function calculate() {
     pointContainer.querySelectorAll('span').forEach(span => span.remove());
 
     // Wyświetlanie maksymalnych wartości z kolorami
-    const maxUniformSpan = document.createElement("span");
     const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
+    const maxUniformSpan = document.createElement("span");
     maxUniformSpan.innerText = `Max Moment (równomierne): ${result.max_uniform_moment.toFixed(2)} kg·m`;
     maxUniformSpan.style.color = isWithinLimits ? "green" : "red";
     maxUniformSpan.style.fontWeight = "bold";
