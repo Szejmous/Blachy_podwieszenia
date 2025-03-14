@@ -12,7 +12,7 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 600px !important; /* Stała szerokość */
+    width: 600px !important; /* Stała szerokośćs */
     height: auto; /* Automatyczna wysokość dla responsywności */
     margin-top: 10px;
     border: 1px solid #ccc;
