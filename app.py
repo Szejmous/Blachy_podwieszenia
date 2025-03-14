@@ -65,7 +65,7 @@ def calculate():
     # Moment maksymalny od obciążenia równomiernego (ql²/8, ujemny, bo w dół)
     max_moment_uniform = -(load_kg_m * L**2) / 8
 
-    # Dokładniejszy wykres momentów od obciążenia równomiernego (parabola, ujemna)
+    # Dokładniejszy wykres momentów od obciążenia równsomiernego (parabola, ujemna)
     x_values = np.linspace(0, L, 50)
     uniform_moment = [-(load_kg_m * x * (L - x)) / 2 for x in x_values]
 
