@@ -84,6 +84,19 @@ def calculate():
     max_point_moment = max(point_moment_values) if point_moment_values else 0
     max_continuous_moment_theoretical = (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
+    # Diagnostyka: Wyświetl dane zwracane przez serwer
+    print("Returned data:", {
+        "L": L,
+        "x_values": x_values.tolist(),
+        "uniform_moment": uniform_moment,
+        "point_moment_values": point_moment_values,
+        "forces": forces,
+        "distances": absolute_distances[1:],
+        "max_uniform_moment": max_uniform_moment,
+        "max_point_moment": max_point_moment,
+        "max_continuous_moment_theoretical": max_continuous_moment_theoretical
+    })
+
     return jsonify({
         "status": "Poprawne obliczenia",
         "L": L,
