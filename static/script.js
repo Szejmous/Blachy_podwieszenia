@@ -9,14 +9,36 @@ const BLACHY = {
 
 document.addEventListener("DOMContentLoaded", function () {
     let forcesDiv = document.getElementById("forces-inputs");
-    for (let i = 1; i <= 6; i++) {
-        forcesDiv.innerHTML += `
+    forcesDiv.innerHTML = `
+        <div class="forces-row">
             <div>
-                <label class="force-label">P${i} (kg): <input id="P${i}" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
-                <label class="distance-label">x${i} (m): <input id="x${i}" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="force-label">P1 (kg): <input id="P1" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x1 (m): <input id="x1" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
             </div>
-        `;
-    }
+            <div>
+                <label class="force-label">P2 (kg): <input id="P2" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x2 (m): <input id="x2" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P3 (kg): <input id="P3" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x3 (m): <input id="x3" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+        </div>
+        <div class="forces-row">
+            <div>
+                <label class="force-label">P4 (kg): <input id="P4" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x4 (m): <input id="x4" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P5 (kg): <input id="P5" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x5 (m): <input id="x5" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+            <div>
+                <label class="force-label">P6 (kg): <input id="P6" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+                <label class="distance-label">x6 (m): <input id="x6" type="number" value="0" onchange="calculate()" oninput="calculate()"></label>
+            </div>
+        </div>
+    `;
     updateBlachy(); // Wypełnij początkowo listę blach
     calculate(); // Wykonaj obliczenia przy załadowaniu strony
 });
@@ -57,7 +79,15 @@ async function calculate() {
     let result = await response.json();
     let resultSpan = document.getElementById("result");
     resultSpan.innerText = result.status;
-    resultSpan.style.color = result.status.includes("Poprawne") ? "green" : "red";
+    const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
+    resultSpan.style.color = isWithinLimits ? "green" : "red";
+    resultSpan.style.fontSize = "18px"; // Większa czcionka niż h2 (16px domyślnie)
+    resultSpan.style.fontWeight = "bold";
+
+    // Aktualizacja nagłówka z obciążeniem ciągłym
+    document.getElementById("uniform-load-heading").innerText = `Fałda obciążona obciążeniem ciągłym (q = ${result.load_kg_m.toFixed(2)} kg/m)`;
+    document.getElementById("uniform-load-heading").style.fontSize = "16px"; // Domyślna wielkość h2
+    document.getElementById("uniform-load-heading").style.fontWeight = "normal";
 
     // Usuń istniejące span-y, aby uniknąć duplikatów
     const uniformContainer = document.querySelector('#uniformMomentChart').parentElement;
@@ -66,7 +96,6 @@ async function calculate() {
     pointContainer.querySelectorAll('span').forEach(span => span.remove());
 
     // Wyświetlanie maksymalnych wartości z kolorami
-    const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
     const maxUniformSpan = document.createElement("span");
     maxUniformSpan.innerText = `Max Moment (równomierne): ${Math.abs(result.max_uniform_moment).toFixed(2)} kg·m`;
     maxUniformSpan.style.color = isWithinLimits ? "green" : "red";
@@ -126,14 +155,14 @@ function drawBeams(result) {
     uniformCtx.textAlign = "center";
     uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 5);
 
-    // Wymiar całkowity
+    // Wymiar całkowity (odsunięty w dół, aby nie nachodził na trójkąty)
     uniformCtx.beginPath();
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 15);
-    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 15);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 15); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 20);
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 10); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 15); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 20);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 30); // Odsunięte o 15px w dół
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 30);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 25); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 30); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 35);
+    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 25); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 30); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 35);
     uniformCtx.stroke();
-    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2, canvasHeight / 2 + 25);
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2, canvasHeight / 2 + 40); // Odsunięty opis
 
     // Belka - obciążenia punktowe
     let pointCtx = pointBeamCanvas.getContext("2d");
