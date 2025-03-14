@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obliczenia blach podwieszeń</title>
+    <title>Podwieszenia instalacji do blachy trapezowej</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/script.js" defer></script>
 </head>
 <body>
-    <h1>Obliczenia blach podwieszeń</h1>
+    <h1>Podwieszenia instalacji do blachy trapezowej</h1>
     <div class="input-container">
         <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label>
         <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6.0" onchange="calculate()" oninput="calculate()"></label>
@@ -33,13 +33,13 @@
         <div><strong>Wniosek: </strong><span id="result">Oczekiwanie...</span></div>
     </div>
 
-    <h2 id="uniform-load-heading">Fałda obciążona obciążeniem ciągłym</h2>
+    <h2 id="uniform-load-heading">Pojedyncza fałda - maksymalne obciążenie wzdłuż równomiernie (nie punktowe)</h2>
     <canvas id="uniformBeam"></canvas>
     <div class="chart-container">
         <canvas id="uniformMomentChart"></canvas>
     </div>
 
-    <h2>Belka - obciążenia punktowe</h2>
+    <h2>Podwieszone instalacje w 1 fałdzie między 2x Płatwiami Kratowymi</h2>
     <canvas id="pointBeam"></canvas>
     <div class="chart-container">
         <canvas id="pointMomentChart"></canvas>
