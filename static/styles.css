@@ -67,3 +67,9 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.forces-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+}
