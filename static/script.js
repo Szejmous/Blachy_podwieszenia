@@ -68,13 +68,13 @@ async function calculate() {
     // Wyświetlanie maksymalnych wartości z kolorami
     const isWithinLimits = Math.abs(result.max_continuous_moment_theoretical) > Math.abs(result.max_point_moment);
     const maxUniformSpan = document.createElement("span");
-    maxUniformSpan.innerText = `Max Moment (równomierne): ${result.max_uniform_moment.toFixed(2)} kg·m`;
+    maxUniformSpan.innerText = `Max Moment (równomierne): ${Math.abs(result.max_uniform_moment).toFixed(2)} kg·m`;
     maxUniformSpan.style.color = isWithinLimits ? "green" : "red";
     maxUniformSpan.style.fontWeight = "bold";
     uniformContainer.insertBefore(maxUniformSpan, uniformContainer.firstChild);
 
     const maxPointSpan = document.createElement("span");
-    maxPointSpan.innerText = `Max Moment (punktowe): ${result.max_point_moment.toFixed(2)} kg·m`;
+    maxPointSpan.innerText = `Max Moment (punktowe): ${Math.abs(result.max_point_moment).toFixed(2)} kg·m`;
     maxPointSpan.style.color = isWithinLimits ? "green" : "red";
     maxPointSpan.style.fontWeight = "bold";
     pointContainer.insertBefore(maxPointSpan, pointContainer.firstChild);
@@ -201,7 +201,7 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const xValues = result.x_values; // Używamy surowych wartości x_values
+    const xValues = result.x_values;
     console.log("xValues:", xValues);
     console.log("point_moment_values:", result.point_moment_values);
 
@@ -216,7 +216,7 @@ function drawCharts(result) {
                 label: 'Moment (kg·m)',
                 data: result.uniform_moment.map((moment, index) => ({
                     x: xValues[index],
-                    y: moment
+                    y: moment  // Wartości są już ujemne z app.py
                 })),
                 borderColor: 'blue',
                 borderWidth: 2,
@@ -234,8 +234,9 @@ function drawCharts(result) {
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 10,
-                        font: { size: 14 },
+                        stepSize: 0.1,  // Etykiety co 0.1 m
+                        font: { size: 10 },  // Mniejszy font, bo etykiety będą gęste
+                        maxTicksLimit: 20,  // Ograniczenie liczby etykiet, aby uniknąć nakładania
                         callback: function(value) {
                             return value.toFixed(1);
                         }
@@ -244,10 +245,10 @@ function drawCharts(result) {
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment) * 1.2 || -10,
-                    max: Math.max(...result.uniform_moment) * 1.2 || 10,
+                    min: Math.min(...result.uniform_moment) * 1.2 || 0,  // Ujemne wartości w dół
+                    max: 0,  // Górna granica na 0
                     ticks: {
-                        stepSize: Math.abs(Math.max(...result.uniform_moment) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,  // Krok dla ujemnych wartości
                         font: { size: 14 }
                     }
                 }
@@ -258,7 +259,7 @@ function drawCharts(result) {
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.parsed.y.toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
+                            return `Moment: ${Math.abs(context.parsed.y).toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
@@ -277,7 +278,7 @@ function drawCharts(result) {
                 label: 'Moment (kg·m)',
                 data: result.point_moment_values.map((moment, index) => ({
                     x: xValues[index],
-                    y: moment
+                    y: moment  // Wartości są już ujemne z app.py
                 })),
                 borderColor: 'red',
                 borderWidth: 2,
@@ -295,8 +296,9 @@ function drawCharts(result) {
                     min: 0,
                     max: L,
                     ticks: {
-                        stepSize: L / 10,
-                        font: { size: 14 },
+                        stepSize: 0.1,  // Etykiety co 0.1 m
+                        font: { size: 10 },  // Mniejszy font, bo etykiety będą gęste
+                        maxTicksLimit: 20,  // Ograniczenie liczby etykiet, aby uniknąć nakładania
                         callback: function(value) {
                             return value.toFixed(1);
                         }
@@ -305,10 +307,10 @@ function drawCharts(result) {
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values) * 1.2 || -10,
-                    max: Math.max(...result.point_moment_values) * 1.2 || 10,
+                    min: Math.min(...result.point_moment_values) * 1.2 || 0,  // Ujemne wartości w dół
+                    max: 0,  // Górna granica na 0
                     ticks: {
-                        stepSize: Math.abs(Math.max(...result.point_moment_values) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,  // Krok dla ujemnych wartości
                         font: { size: 14 }
                     }
                 }
@@ -319,7 +321,7 @@ function drawCharts(result) {
                     bodyFont: { size: 14 },
                     callbacks: {
                         label: function(context) {
-                            return `Moment: ${context.parsed.y.toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
+                            return `Moment: ${Math.abs(context.parsed.y).toFixed(2)} kg·m at ${context.parsed.x.toFixed(1)} m`;
                         }
                     }
                 }
