@@ -64,7 +64,7 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = 600; // Stała szerokość bazowa
+    const canvasWidth = 600; // Bazowa szerokość
     const canvasHeight = 100; // Stała wysokość dla belek
     const beamHeight = 20; // Wysokość belki
     const supportWidth = 20; // Szerokość podpór
@@ -83,7 +83,7 @@ function drawBeams(result) {
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
     uniformCtx.lineWidth = 2;
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka na środku
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
     uniformCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
@@ -116,7 +116,7 @@ function drawBeams(result) {
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
     pointCtx.lineWidth = 2;
-    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka na środku
+    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     pointCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
     pointCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
@@ -136,14 +136,15 @@ function drawBeams(result) {
         let x = supportWidth + (result.distances[i] / L) * (canvasWidth - 2 * supportWidth);
         pointCtx.strokeStyle = "blue";
         pointCtx.beginPath();
-        pointCtx.moveTo(x, canvasHeight / 2);
-        pointCtx.lineTo(x, canvasHeight / 2 + 20);
-        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15);
+        pointCtx.moveTo(x, canvasHeight / 2); // Początek strzałki
+        pointCtx.lineTo(x, canvasHeight / 2 + 20); // W dół
+        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15); // Lewa część grotu
         pointCtx.moveTo(x, canvasHeight / 2 + 20);
-        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15);
+        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15); // Prawa część grotu
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 + 30);
+        // Etykieta nad strzałką (nad belką)
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 - 10);
     }
     pointCtx.stroke();
 
@@ -170,140 +171,132 @@ function drawBeams(result) {
 }
 
 function drawCharts(result) {
-    let L = result.L;
-
-    // Wykres momentów - obciążenie równomierne
+    // Czyszczenie istniejących wykresów
     if (uniformChart) uniformChart.destroy();
-    uniformChart = new Chart(document.getElementById("uniformMomentChart").getContext("2d"), {
+    if (pointChart) pointChart.destroy();
+
+    const L = result.L;
+    const canvasWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600;
+    const canvasHeight = 300; // Stała wysokość dla wykresów
+
+    // Ustawienie wymiarów canvasów
+    document.getElementById('uniformMomentChart').width = canvasWidth;
+    document.getElementById('uniformMomentChart').height = canvasHeight;
+    document.getElementById('pointMomentChart').width = canvasWidth;
+    document.getElementById('pointMomentChart').height = canvasHeight;
+
+    // Nowy wykres dla obciążenia równomiernego
+    uniformChart = new Chart(document.getElementById('uniformMomentChart'), {
         type: 'line',
         data: {
             labels: result.x_values.map(x => x.toFixed(2)),
             datasets: [{
-                label: "Moment od obciążenia równomiernego",
+                label: 'Moment od obciążenia równomiernego (kg·m)',
                 data: result.uniform_moment,
-                borderColor: "blue",
+                borderColor: 'blue',
+                borderWidth: 2,
                 fill: false,
-                pointRadius: 2,
-                tension: 0.1
+                pointRadius: 0
             }]
         },
         options: {
-            maintainAspectRatio: false,
             responsive: true,
-            aspectRatio: 2,
+            maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: false,
-                    reverse: true,
-                    title: { display: true, text: 'Moment (kg·m)' },
-                    ticks: { stepSize: 10 },
-                    min: Math.min(...result.uniform_moment) * 1.1,
-                    max: 0
-                },
                 x: {
-                    title: { display: true, text: 'Odległość (m)' },
+                    title: {
+                        display: true,
+                        text: 'Odległość (m)'
+                    },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: L / 5 }
+                    ticks: {
+                        stepSize: L / 5
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    beginAtZero: false,
+                    reverse: true,
+                    min: Math.min(...result.uniform_moment) * 1.2, // Margines dla czytelności
+                    max: 0,
+                    ticks: {
+                        stepSize: 10
+                    }
                 }
             },
             plugins: {
-                legend: { position: 'top' },
-                annotation: {
-                    annotations: [{
-                        type: 'label',
-                        xValue: (L / 2).toFixed(2),
-                        yValue: result.max_moment_uniform,
-                        content: [`Max: ${Math.abs(result.max_moment_uniform).toFixed(2)} kg·m`],
-                        color: 'blue',
-                        position: 'start',
-                        xAdjust: 0,
-                        yAdjust: 20,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
-                    }, {
-                        type: 'line',
-                        yMin: result.max_moment_uniform,
-                        yMax: result.max_moment_uniform,
-                        borderColor: 'green',
-                        borderWidth: 1
-                    }]
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
             }
         }
     });
 
-    // Wykres momentów - obciążenia punktowe
-    if (pointChart) pointChart.destroy();
-    pointChart = new Chart(document.getElementById("pointMomentChart").getContext("2d"), {
+    // Nowy wykres dla obciążeń punktowych
+    pointChart = new Chart(document.getElementById('pointMomentChart'), {
         type: 'line',
         data: {
             labels: result.point_moment_x.map(x => x.toFixed(2)),
             datasets: [{
-                label: "Moment od sił punktowych",
+                label: 'Moment od sił punktowych (kg·m)',
                 data: result.point_moment_values,
-                borderColor: "red",
+                borderColor: 'red',
+                borderWidth: 2,
                 fill: false,
-                pointRadius: 2,
-                tension: 0.1
+                pointRadius: 0
             }]
         },
         options: {
-            maintainAspectRatio: false,
             responsive: true,
-            aspectRatio: 2,
+            maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: false,
-                    reverse: true,
-                    title: { display: true, text: 'Moment (kg·m)' },
-                    ticks: { stepSize: 10 },
-                    min: Math.min(...result.point_moment_values) * 1.1,
-                    max: 0
-                },
                 x: {
-                    title: { display: true, text: 'Odległość (m)' },
+                    title: {
+                        display: true,
+                        text: 'Odległość (m)'
+                    },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: L / 5 }
+                    ticks: {
+                        stepSize: L / 5
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Moment (kg·m)'
+                    },
+                    beginAtZero: false,
+                    reverse: true,
+                    min: Math.min(...result.point_moment_values) * 1.2, // Margines dla czytelności
+                    max: 0,
+                    ticks: {
+                        stepSize: 10
+                    }
                 }
             },
             plugins: {
-                legend: { position: 'top' },
-                annotation: {
-                    annotations: result.moment_values.map((m, i) => ({
-                        type: 'label',
-                        xValue: result.point_moment_x[i + 1].toFixed(2),
-                        yValue: m,
-                        content: [`${m.toFixed(2)} kg·m`],
-                        color: 'blue',
-                        position: 'start',
-                        xAdjust: 0,
-                        yAdjust: 20,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
-                    })).concat({
-                        type: 'label',
-                        xValue: (result.point_moment_x[Math.floor(result.point_moment_x.length / 2)]).toFixed(2),
-                        yValue: result.max_moment_forces,
-                        content: [`Max: ${Math.abs(result.max_moment_forces).toFixed(2)} kg·m`],
-                        color: 'red',
-                        position: 'start',
-                        xAdjust: 0,
-                        yAdjust: 20,
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
-                    }, {
-                        type: 'line',
-                        yMin: result.max_moment_forces,
-                        yMax: result.max_moment_forces,
-                        borderColor: 'green',
-                        borderWidth: 1
-                    })
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
             }
         }
     });
 }
 
-// Obsługa zmiany rozmiaru okna (responsywność)
+// Obsługa zmiany rozmiaru okna
 window.addEventListener('resize', function () {
-    calculate(); // Ponowne narysowanie belek i wykresów przy zmianie rozmiaru
+    calculate(); // Ponowne narysowanie belek i wykresów
 });
