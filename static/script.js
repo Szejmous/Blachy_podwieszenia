@@ -188,7 +188,7 @@ function drawBeams(result) {
         prevX = x;
     }
     pointCtx.moveTo(prevX, canvasHeight / 2 + 25);
-    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 25);
+    pointCtx.lineTo(canvasWidth - ** supportWidth, canvasHeight / 2 + 25);
     pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
     pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 20); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 25); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 30);
     pointCtx.fillText(`${L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)} m`, (prevX + canvasWidth - supportWidth) / 2, canvasHeight / 2 + 35);
@@ -201,8 +201,7 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const xStep = L / 10; // Krok co L/10
-    const xLabels = result.x_values.map(x => x.toFixed(1)); // Etykiety co L/10
+    const xLabels = result.x_values.map(x => x.toFixed(2)); // Etykiety osi X
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
@@ -229,15 +228,18 @@ function drawCharts(result) {
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: xStep, font: { size: 14 } }
+                    ticks: {
+                        stepSize: L / 10, // Krok na osi X
+                        font: { size: 14 }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment) * 1.2 || -10,
-                    max: 0,
+                    min: Math.min(...result.uniform_moment, 0) * 1.2 || -10,
+                    max: Math.max(...result.uniform_moment, 0) * 1.2 || 10,
                     ticks: {
-                        stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.max(...result.uniform_moment, 0) * 1.2) / 5 || 2,
                         font: { size: 14 }
                     }
                 }
@@ -281,15 +283,18 @@ function drawCharts(result) {
                     title: { display: true, text: 'Odległość [m]' },
                     min: 0,
                     max: L,
-                    ticks: { stepSize: xStep, font: { size: 14 } }
+                    ticks: {
+                        stepSize: L / 10, // Krok na osi X
+                        font: { size: 14 }
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Moment [kg·m]' },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values) * 1.2 || -10,
-                    max: 0,
+                    min: Math.min(...result.point_moment_values, 0) * 1.2 || -10,
+                    max: Math.max(...result.point_moment_values, 0) * 1.2 || 10,
                     ticks: {
-                        stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,
+                        stepSize: Math.abs(Math.max(...result.point_moment_values, 0) * 1.2) / 5 || 2,
                         font: { size: 14 }
                     }
                 }
