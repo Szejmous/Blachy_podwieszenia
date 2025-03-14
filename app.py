@@ -58,7 +58,7 @@ def calculate():
         "load_kg_m": load_kg_m,
         "L": L,
         "max_moment_uniform": max_moment_uniform,
-        "uniform_moment": uniform_moment.tolist(),
+        "uniform_moment": uniform_moment,  # Usunięto .tolist()
         "x_values": x_values.tolist(),
         "forces": forces,
         "distances": cumulative_distances,
