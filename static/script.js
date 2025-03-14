@@ -202,6 +202,7 @@ function drawCharts(result) {
 
     const L = result.L;
     const xLabels = result.x_values.map(x => x.toFixed(1)); // Etykiety co L/10
+    console.log("xLabels:", xLabels); // Diagnostyka: wyświetl xLabels w konsoli
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
