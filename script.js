@@ -202,7 +202,10 @@ function drawCharts(result) {
 
     const L = result.L;
     const xLabels = result.x_values.map(x => x.toFixed(2)); // Etykiety osi X
-
+    
+console.log("xLabels:", xLabels);
+console.log("point_moment_values:", result.point_moment_values);
+    
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
     uniformCanvas.style.width = '100%';
