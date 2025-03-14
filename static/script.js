@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
 async function calculate() {
     let data = {
         load_kg_m2: document.getElementById("load_kg_m2").value,
-        spacing_mm: document.getElementById("spacing_mm").value
+        spacing_mm: document.getElementById("spacing_mm").value,
+        beam_span: document.getElementById("beam_span").value
     };
 
     for (let i = 1; i <= 6; i++) {
@@ -37,50 +38,87 @@ async function calculate() {
 }
 
 function drawBeams(result) {
+    const canvasWidth = 300;
+    const canvasHeight = 50;
+
     // Belka - obciążenie równomierne
     let uniformCtx = document.getElementById("uniformBeam").getContext("2d");
-    uniformCtx.clearRect(0, 0, 600, 100);
+    uniformCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     uniformCtx.beginPath();
-    uniformCtx.moveTo(0, 50); // Podpora lewa
-    uniformCtx.lineTo(600, 50); // Belka
-    uniformCtx.moveTo(0, 50);
-    uniformCtx.lineTo(10, 70); // Podpora lewa
-    uniformCtx.moveTo(600, 50);
-    uniformCtx.lineTo(590, 70); // Podpora prawa
+    uniformCtx.moveTo(10, 25); // Belka
+    uniformCtx.lineTo(canvasWidth - 10, 25);
+    uniformCtx.moveTo(10, 25); // Podpora lewa (trójkąt)
+    uniformCtx.lineTo(20, 45);
+    uniformCtx.lineTo(0, 45);
+    uniformCtx.closePath();
+    uniformCtx.moveTo(canvasWidth - 10, 25); // Podpora prawa (rolka)
+    uniformCtx.lineTo(canvasWidth - 20, 45);
+    uniformCtx.lineTo(canvasWidth, 45);
     uniformCtx.stroke();
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m`, 280, 20);
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m`, canvasWidth / 2 - 30, 10);
+
+    // Wymiar całkowity z znakami architektonicznymi
+    uniformCtx.beginPath();
+    uniformCtx.moveTo(10, 45);
+    uniformCtx.lineTo(canvasWidth - 10, 45);
+    uniformCtx.moveTo(10, 40); uniformCtx.lineTo(15, 45); uniformCtx.lineTo(10, 50); // Lewy znak
+    uniformCtx.moveTo(canvasWidth - 10, 40); uniformCtx.lineTo(canvasWidth - 15, 45); uniformCtx.lineTo(canvasWidth - 10, 50); // Prawy znak
+    uniformCtx.stroke();
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, 40);
 
     // Belka - obciążenia punktowe
     let pointCtx = document.getElementById("pointBeam").getContext("2d");
-    pointCtx.clearRect(0, 0, 600, 100);
+    pointCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     pointCtx.beginPath();
-    pointCtx.moveTo(0, 50); // Podpora lewa
-    pointCtx.lineTo(600, 50); // Belka
-    pointCtx.moveTo(0, 50);
-    pointCtx.lineTo(10, 70); // Podpora lewa
-    pointCtx.moveTo(600, 50);
-    pointCtx.lineTo(590, 70); // Podpora prawa
+    pointCtx.moveTo(10, 25); // Belka
+    pointCtx.lineTo(canvasWidth - 10, 25);
+    pointCtx.moveTo(10, 25); // Podpora lewa (trójkąt)
+    pointCtx.lineTo(20, 45);
+    pointCtx.lineTo(0, 45);
+    pointCtx.closePath();
+    pointCtx.moveTo(canvasWidth - 10, 25); // Podpora prawa (rolka)
+    pointCtx.lineTo(canvasWidth - 20, 45);
+    pointCtx.lineTo(canvasWidth, 45);
 
     let L = result.L;
     for (let i = 0; i < result.forces.length; i++) {
-        let x = (result.distances[i] / L) * 600;
-        pointCtx.moveTo(x, 50);
-        pointCtx.lineTo(x, 30); // Strzałka w dół
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, 20);
+        let x = 10 + (result.distances[i] / L) * (canvasWidth - 20);
+        pointCtx.moveTo(x, 25);
+        pointCtx.lineTo(x, 15); // Strzałka w dół
+        pointCtx.lineTo(x - 5, 20); pointCtx.moveTo(x, 15); pointCtx.lineTo(x + 5, 20);
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, 10);
     }
+    pointCtx.stroke();
+
+    // Wymiary z domiarami i znakami architektonicznymi
+    pointCtx.beginPath();
+    let prevX = 10;
+    for (let i = 0; i < result.distances.length; i++) {
+        let x = 10 + (result.distances[i] / L) * (canvasWidth - 20);
+        pointCtx.moveTo(prevX, 45);
+        pointCtx.lineTo(x, 45);
+        pointCtx.moveTo(prevX, 40); pointCtx.lineTo(prevX + 5, 45); pointCtx.lineTo(prevX, 50); // Znak początkowy
+        pointCtx.moveTo(x, 40); pointCtx.lineTo(x - 5, 45); pointCtx.lineTo(x, 50); // Znak końcowy
+        pointCtx.fillText(`${result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)} m`, (prevX + x) / 2 - 10, 40);
+        prevX = x;
+    }
+    pointCtx.moveTo(prevX, 45);
+    pointCtx.lineTo(canvasWidth - 10, 45);
+    pointCtx.moveTo(prevX, 40); pointCtx.lineTo(prevX + 5, 45); pointCtx.lineTo(prevX, 50);
+    pointCtx.moveTo(canvasWidth - 10, 40); pointCtx.lineTo(canvasWidth - 15, 45); pointCtx.lineTo(canvasWidth - 10, 50);
+    pointCtx.fillText(`${L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)} m`, (prevX + canvasWidth - 10) / 2 - 10, 40);
     pointCtx.stroke();
 }
 
 function drawCharts(result) {
     let L = result.L;
-    let labels = ["0", "L/4", "L/2", "3L/4", "L"];
 
     // Wykres momentów - obciążenie równomierne
     if (uniformChart) uniformChart.destroy();
     uniformChart = new Chart(document.getElementById("uniformMomentChart").getContext("2d"), {
         type: 'line',
         data: {
-            labels: labels,
+            labels: result.x_values.map(x => x.toFixed(2)),
             datasets: [{
                 label: "Moment od obciążenia równomiernego",
                 data: result.uniform_moment,
@@ -88,16 +126,31 @@ function drawCharts(result) {
                 fill: false
             }]
         },
-        options: { scales: { y: { beginAtZero: true } } }
+        options: {
+            scales: { y: { beginAtZero: true } },
+            plugins: {
+                annotation: {
+                    annotations: [{
+                        type: 'line',
+                        yMin: result.max_moment_uniform,
+                        yMax: result.max_moment_uniform,
+                        borderColor: 'green',
+                        borderWidth: 1,
+                        label: { content: `Max: ${result.max_moment_uniform.toFixed(2)} kg·m`, enabled: true }
+                    }]
+                }
+            }
+        }
     });
 
     // Wykres momentów - obciążenia punktowe
     if (pointChart) pointChart.destroy();
     let pointMoments = [0, ...result.moment_values, 0];
+    let pointLabels = ["0", ...result.distances.map((d, i) => `x${i + 1}`), `${L}`];
     pointChart = new Chart(document.getElementById("pointMomentChart").getContext("2d"), {
         type: 'line',
         data: {
-            labels: ["0", ...result.distances.map((d, i) => `x${i + 1}`), "L"],
+            labels: pointLabels,
             datasets: [{
                 label: "Moment od sił punktowych",
                 data: pointMoments,
@@ -105,6 +158,27 @@ function drawCharts(result) {
                 fill: false
             }]
         },
-        options: { scales: { y: { beginAtZero: true } } }
+        options: {
+            scales: { y: { beginAtZero: true } },
+            plugins: {
+                annotation: {
+                    annotations: result.moment_values.map((m, i) => ({
+                        type: 'point',
+                        xValue: pointLabels[i + 1],
+                        yValue: m,
+                        backgroundColor: 'red',
+                        radius: 4,
+                        label: { content: `${m.toFixed(2)} kg·m`, enabled: true }
+                    })).concat({
+                        type: 'line',
+                        yMin: result.max_moment_forces,
+                        yMax: result.max_moment_forces,
+                        borderColor: 'green',
+                        borderWidth: 1,
+                        label: { content: `Max: ${result.max_moment_forces.toFixed(2)} kg·m`, enabled: true }
+                    })
+                }
+            }
+        }
     });
 }
