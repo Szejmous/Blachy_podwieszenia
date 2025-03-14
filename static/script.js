@@ -62,10 +62,10 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = 600;
-    const canvasHeight = 100;
-    const beamHeight = 20;
-    const supportWidth = 20;
+    const canvasWidth = document.getElementById("uniformBeam").offsetWidth;
+    const canvasHeight = document.getElementById("uniformBeam").offsetHeight;
+    const beamHeight = canvasWidth * 0.05; // 5% szerokości canvasu
+    const supportWidth = canvasWidth * 0.05; // 5% szerokości canvasu
 
     // Belka - obciążenie równomierne
     let uniformCtx = document.getElementById("uniformBeam").getContext("2d");
@@ -75,24 +75,24 @@ function drawBeams(result) {
     uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Podpora lewa (trójkąt)
-    uniformCtx.lineTo(supportWidth + 10, canvasHeight / 2 - beamHeight);
-    uniformCtx.lineTo(supportWidth - 10, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(supportWidth + beamHeight / 2, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(supportWidth - beamHeight / 2, canvasHeight / 2 - beamHeight);
     uniformCtx.closePath();
     uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Podpora prawa (rolka)
-    uniformCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - beamHeight);
-    uniformCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth + beamHeight / 2, canvasHeight / 2 - beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth - beamHeight / 2, canvasHeight / 2 - beamHeight);
     uniformCtx.stroke();
     uniformCtx.fillStyle = "black";
     uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 80, 20);
 
     // Wymiar całkowity
     uniformCtx.beginPath();
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 10);
-    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 10);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 5); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 10); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 15);
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 5); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 10); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 15);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + beamHeight - 5); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + beamHeight); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + beamHeight + 5);
+    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight - 5); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + beamHeight); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 5);
     uniformCtx.stroke();
-    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 20);
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + beamHeight + 10);
 
     // Belka - obciążenia punktowe
     let pointCtx = document.getElementById("pointBeam").getContext("2d");
@@ -102,12 +102,12 @@ function drawBeams(result) {
     pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka
     pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
     pointCtx.moveTo(supportWidth, canvasHeight / 2); // Podpora lewa (trójkąt)
-    pointCtx.lineTo(supportWidth + 10, canvasHeight / 2 - beamHeight);
-    pointCtx.lineTo(supportWidth - 10, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(supportWidth + beamHeight / 2, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(supportWidth - beamHeight / 2, canvasHeight / 2 - beamHeight);
     pointCtx.closePath();
     pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Podpora prawa (rolka)
-    pointCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - beamHeight);
-    pointCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth + beamHeight / 2, canvasHeight / 2 - beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth - beamHeight / 2, canvasHeight / 2 - beamHeight);
 
     let L = result.L;
     for (let i = 0; i < result.forces.length; i++) {
@@ -115,13 +115,13 @@ function drawBeams(result) {
         pointCtx.strokeStyle = "blue";
         pointCtx.beginPath();
         pointCtx.moveTo(x, canvasHeight / 2); // Początek strzałki
-        pointCtx.lineTo(x, canvasHeight / 2 + 20); // W dół
-        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15); // Lewa część grotu
-        pointCtx.moveTo(x, canvasHeight / 2 + 20);
-        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15); // Prawa część grotu
+        pointCtx.lineTo(x, canvasHeight / 2 + beamHeight); // W dół
+        pointCtx.lineTo(x - beamHeight / 4, canvasHeight / 2 + beamHeight - beamHeight / 4); // Lewa część grotu
+        pointCtx.moveTo(x, canvasHeight / 2 + beamHeight);
+        pointCtx.lineTo(x + beamHeight / 4, canvasHeight / 2 + beamHeight - beamHeight / 4); // Prawa część grotu
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 + 30);
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 + beamHeight + 10);
     }
     pointCtx.stroke();
 
@@ -132,18 +132,18 @@ function drawBeams(result) {
     let prevX = supportWidth;
     for (let i = 0; i < result.distances.length; i++) {
         let x = supportWidth + (result.distances[i] / L) * (canvasWidth - 2 * supportWidth);
-        pointCtx.moveTo(prevX, canvasHeight / 2 + 10);
-        pointCtx.lineTo(x, canvasHeight / 2 + 10);
-        pointCtx.moveTo(prevX, canvasHeight / 2 + 5); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 10); pointCtx.lineTo(prevX, canvasHeight / 2 + 15);
-        pointCtx.moveTo(x, canvasHeight / 2 + 5); pointCtx.lineTo(x - 5, canvasHeight / 2 + 10); pointCtx.lineTo(x, canvasHeight / 2 + 15);
-        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, canvasHeight / 2 + 20);
+        pointCtx.moveTo(prevX, canvasHeight / 2 + beamHeight);
+        pointCtx.lineTo(x, canvasHeight / 2 + beamHeight);
+        pointCtx.moveTo(prevX, canvasHeight / 2 + beamHeight - 5); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + beamHeight); pointCtx.lineTo(prevX, canvasHeight / 2 + beamHeight + 5);
+        pointCtx.moveTo(x, canvasHeight / 2 + beamHeight - 5); pointCtx.lineTo(x - 5, canvasHeight / 2 + beamHeight); pointCtx.lineTo(x, canvasHeight / 2 + beamHeight + 5);
+        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, canvasHeight / 2 + beamHeight + 10);
         prevX = x;
     }
-    pointCtx.moveTo(prevX, canvasHeight / 2 + 10);
-    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 10);
-    pointCtx.moveTo(prevX, canvasHeight / 2 + 5); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 10); pointCtx.lineTo(prevX, canvasHeight / 2 + 15);
-    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 5); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 10); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 15);
-    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2 - 10, canvasHeight / 2 + 20);
+    pointCtx.moveTo(prevX, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight);
+    pointCtx.moveTo(prevX, canvasHeight / 2 + beamHeight - 5); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + beamHeight); pointCtx.lineTo(prevX, canvasHeight / 2 + beamHeight + 5);
+    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight - 5); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + beamHeight); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 5);
+    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2 - 10, canvasHeight / 2 + beamHeight + 10);
     pointCtx.stroke();
 }
 
