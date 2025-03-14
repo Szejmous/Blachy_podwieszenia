@@ -10,10 +10,15 @@ h1, h2, h3 {
 
 canvas {
     width: 80%; /* 80% szerokości okna */
-    height: auto; /* Automatyczna wysokość na podstawie proporcji */
+    height: 150px; /* Stała minimalna wysokość dla belek */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
+    display: block; /* Zapewnia prawidłowe renderowanie */
+}
+
+.input-container {
+    margin-bottom: 20px;
 }
 
 label {
