@@ -72,7 +72,7 @@ function drawBeams(result) {
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
     const pointBeamCanvas = document.getElementById("pointBeam");
-    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość dla ostrości
+    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość
     uniformBeamCanvas.height = canvasHeight * 2;
     uniformBeamCanvas.style.width = `${canvasWidth}px`;
     uniformBeamCanvas.style.height = `${canvasHeight}px`;
@@ -102,7 +102,7 @@ function drawBeams(result) {
     uniformCtx.closePath();
     uniformCtx.fill();
     uniformCtx.stroke();
-    uniformCtx.font = "12px Arial"; // Stały rozmiar fontu
+    uniformCtx.font = "12px Arial";
     uniformCtx.fillStyle = "black";
     uniformCtx.textAlign = "center";
     uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 5);
@@ -151,7 +151,7 @@ function drawBeams(result) {
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
         pointCtx.textAlign = "center";
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x, canvasHeight / 2 - 15); // Poprawiona pozycja i wyrównanie
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x, canvasHeight / 2 - 15);
     }
     pointCtx.stroke();
 
@@ -183,13 +183,15 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
+    const chartWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600; // Aktualna szerokość okna
+    const chartHeight = 300; // Stała wysokość
 
     // Nowy wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
-    uniformCanvas.width = uniformCanvas.parentElement.clientWidth * 2 || 1200; // Podwójna rozdzielczość
-    uniformCanvas.height = 300 * 2; // Podwójna rozdzielczość
-    uniformCanvas.style.width = `${uniformCanvas.parentElement.clientWidth || 600}px`;
-    uniformCanvas.style.height = '300px';
+    uniformCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
+    uniformCanvas.height = chartHeight * 2;
+    uniformCanvas.style.width = `${chartWidth}px`;
+    uniformCanvas.style.height = `${chartHeight}px`;
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
@@ -219,7 +221,7 @@ function drawCharts(result) {
                     ticks: {
                         stepSize: L / 5,
                         font: {
-                            size: 14 // Stały rozmiar fontu
+                            size: 14
                         }
                     }
                 },
@@ -229,12 +231,12 @@ function drawCharts(result) {
                         text: 'Moment (kg·m)'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment) * 1.2,
+                    min: Math.min(...result.uniform_moment) * 1.2 || -10, // Dynamiczny zakres
                     max: 0,
                     ticks: {
-                        stepSize: 10,
+                        stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,
                         font: {
-                            size: 14 // Stały rozmiar fontu
+                            size: 14
                         }
                     }
                 }
@@ -264,10 +266,10 @@ function drawCharts(result) {
 
     // Nowy wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
-    pointCanvas.width = pointCanvas.parentElement.clientWidth * 2 || 1200; // Podwójna rozdzielczość
-    pointCanvas.height = 300 * 2; // Podwójna rozdzielczość
-    pointCanvas.style.width = `${pointCanvas.parentElement.clientWidth || 600}px`;
-    pointCanvas.style.height = '300px';
+    pointCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
+    pointCanvas.height = chartHeight * 2;
+    pointCanvas.style.width = `${chartWidth}px`;
+    pointCanvas.style.height = `${chartHeight}px`;
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
@@ -297,7 +299,7 @@ function drawCharts(result) {
                     ticks: {
                         stepSize: L / 5,
                         font: {
-                            size: 14 // Stały rozmiar fontu
+                            size: 14
                         }
                     }
                 },
@@ -307,12 +309,12 @@ function drawCharts(result) {
                         text: 'Moment (kg·m)'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values) * 1.2,
+                    min: Math.min(...result.point_moment_values) * 1.2 || -10, // Dynamiczny zakres
                     max: 0,
                     ticks: {
-                        stepSize: 10,
+                        stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,
                         font: {
-                            size: 14 // Stały rozmiar fontu
+                            size: 14
                         }
                     }
                 }
