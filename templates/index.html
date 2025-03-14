@@ -12,7 +12,8 @@
 
     <div>
         <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="0"></label><br>
-        <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number" value="0"></label>
+        <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number" value="0"></label><br>
+        <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="1"></label>
     </div>
 
     <h2>Siły punktowe</h2>
@@ -23,11 +24,11 @@
     <h3>Wynik: <span id="result" style="color: red;"></span></h3>
 
     <h2>Belka - obciążenie równomierne</h2>
-    <canvas id="uniformBeam" width="600" height="100"></canvas>
-    <canvas id="uniformMomentChart" width="600" height="200"></canvas>
+    <canvas id="uniformBeam" width="300" height="50"></canvas>
+    <canvas id="uniformMomentChart" width="300" height="100"></canvas>
 
     <h2>Belka - obciążenia punktowe</h2>
-    <canvas id="pointBeam" width="600" height="100"></canvas>
-    <canvas id="pointMomentChart" width="600" height="200"></canvas>
+    <canvas id="pointBeam" width="300" height="50"></canvas>
+    <canvas id="pointMomentChart" width="300" height="100"></canvas>
 </body>
 </html>
