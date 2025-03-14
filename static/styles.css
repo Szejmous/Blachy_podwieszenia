@@ -21,7 +21,7 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 100%; /* Pełna szerokość w kontenerze */
+    width: 100%; /* Pełna szerokość w skontenerze */
     height: 100%; /* Pełna wysokość w kontenerze */
     border: 1px solid #ccc;
     background-color: #fff;
