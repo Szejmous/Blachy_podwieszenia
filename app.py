@@ -42,14 +42,26 @@ def calculate():
     x_values = np.linspace(0, L, 50)
     uniform_moment = [load_kg_m * x * (L - x) / 2 for x in x_values]
 
-    # Moment od sił punktowych
-    moment_values = []
+    # Obliczanie reakcji w podporach dla sił punktowych
+    R_A = 0  # Reakcja w lewej podporze
+    R_B = 0  # Reakcja w prawej podporze
     for i, P in enumerate(forces):
         x = cumulative_distances[i]
-        moment = P * x * (L - x) / L
-        moment_values.append(moment)
+        R_A += P * (L - x) / L  # Składowa reakcji w A
+        R_B += P * x / L        # Składowa reakcji w B
 
-    max_moment_forces = max(moment_values) if moment_values else 0
+    # Obliczanie momentów od sił punktowych w punktach sił i na końcach
+    moment_values = []  # Momenty w miejscach sił
+    point_moment_x = [0] + cumulative_distances + [L]  # Punkty x dla wykresu (0, miejsca sił, L)
+    point_moment_values = [0]  # Moment na początku belki (0)
+    current_moment = 0
+    for i, x in enumerate(cumulative_distances):
+        current_moment = R_A * x - sum(P * (x - d) for P, d in zip(forces, cumulative_distances) if d < x)
+        moment_values.append(current_moment)
+        point_moment_values.append(current_moment)
+    point_moment_values.append(0)  # Moment na końcu belki (0)
+
+    max_moment_forces = max([abs(m) for m in moment_values]) if moment_values else 0
 
     # Sprawdzenie poprawności podwieszenia
     status = "Poprawne podwieszenie." if max_moment_forces <= max_moment_uniform else "Złe podwieszenie, zmniejsz obciążenie lub zmień lokalizację."
@@ -58,11 +70,13 @@ def calculate():
         "load_kg_m": load_kg_m,
         "L": L,
         "max_moment_uniform": max_moment_uniform,
-        "uniform_moment": uniform_moment,  # Usunięto .tolist()
+        "uniform_moment": uniform_moment,
         "x_values": x_values.tolist(),
         "forces": forces,
         "distances": cumulative_distances,
         "moment_values": moment_values,
+        "point_moment_x": point_moment_x,
+        "point_moment_values": point_moment_values,
         "max_moment_forces": max_moment_forces,
         "status": status
     })
