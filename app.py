@@ -62,12 +62,12 @@ def calculate():
         cumulative_distances.append(cumulative_distances[-1] + x)
     cumulative_distances.pop(0)
 
-    # Moment maksymalny od obciążenia równomiernego (ql²/8)
-    max_moment_uniform = (load_kg_m * L**2) / 8
+    # Moment maksymalny od obciążenia równomiernego (ql²/8, ujemny, bo w dół)
+    max_moment_uniform = -(load_kg_m * L**2) / 8
 
-    # Dokładniejszy wykres momentów od obciążenia równomiernego (parabola)
+    # Dokładniejszy wykres momentów od obciążenia równomiernego (parabola, ujemna)
     x_values = np.linspace(0, L, 50)
-    uniform_moment = [load_kg_m * x * (L - x) / 2 for x in x_values]
+    uniform_moment = [-(load_kg_m * x * (L - x)) / 2 for x in x_values]
 
     # Obliczanie reakcji w podporach dla sił punktowych
     R_A = 0  # Reakcja w lewej podporze
@@ -77,21 +77,21 @@ def calculate():
         R_A += P * (L - x) / L  # Składowa reakcji w A
         R_B += P * x / L        # Składowa reakcji w B
 
-    # Obliczanie momentów od sił punktowych w punktach sił i na końcach
+    # Obliczanie momentów od sił punktowych w punktach sił i na końcach (ujemne)
     moment_values = []  # Momenty w miejscach sił
     point_moment_x = [0] + cumulative_distances + [L]  # Punkty x dla wykresu
     point_moment_values = [0]  # Moment na początku belki (0)
     current_moment = 0
     for i, x in enumerate(cumulative_distances):
-        current_moment = R_A * x - sum(P * (x - d) for P, d in zip(forces, cumulative_distances) if d < x)
+        current_moment = -(R_A * x - sum(P * (x - d) for P, d in zip(forces, cumulative_distances) if d < x))
         moment_values.append(current_moment)
         point_moment_values.append(current_moment)
     point_moment_values.append(0)  # Moment na końcu belki (0)
 
-    max_moment_forces = max([abs(m) for m in moment_values]) if moment_values else 0
+    max_moment_forces = min([m for m in moment_values]) if moment_values else 0  # Minimum, bo ujemne
 
     # Sprawdzenie poprawności podwieszenia
-    status = "Poprawne podwieszenie." if max_moment_forces <= max_moment_uniform else "Złe podwieszenie, zmniejsz obciążenie lub zmień lokalizację."
+    status = "Poprawne podwieszenie." if abs(max_moment_forces) <= abs(max_moment_uniform) else "Złe podwieszenie, zmniejsz obciążenie lub zmień lokalizację."
 
     return jsonify({
         "load_kg_m": load_kg_m,
