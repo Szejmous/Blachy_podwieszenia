@@ -9,12 +9,11 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 80%; /* 80% szerokości okna */
-    height: 150px; /* Stała minimalna wysokość dla belek */
+    width: 600px; /* Stała szerokość dla spójności */
+    height: 100px; /* Stała wysokość dla belek */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
-    display: block; /* Zapewnia prawidłowe renderowanie */
 }
 
 .input-container {
