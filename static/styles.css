@@ -12,17 +12,16 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 100%; /* Responsywnosść */
+    width: 100%; /* Responsywność */
     max-width: 600px; /* Maksymalna szerokość */
-    height: auto; /* Automatyczna wysokość dla responsywności */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
     display: block;
 }
 
+/* Usunięto sztywne ustawienie height i width dla wykresów */
 #uniformMomentChart, #pointMomentChart {
-    height: 300px !important; /* Stała wysokość dla wykresów */
     width: 100% !important; /* Responsywność */
     max-width: 600px;
 }
