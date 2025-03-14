@@ -72,7 +72,7 @@ function drawBeams(result) {
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
     const pointBeamCanvas = document.getElementById("pointBeam");
-    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość
+    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość dla ostrości
     uniformBeamCanvas.height = canvasHeight * 2;
     uniformBeamCanvas.style.width = `${canvasWidth}px`;
     uniformBeamCanvas.style.height = `${canvasHeight}px`;
@@ -183,10 +183,10 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const chartWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600; // Aktualna szerokość okna
-    const chartHeight = 300; // Stała wysokość
+    const chartWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600;
+    const chartHeight = 300;
 
-    // Nowy wykres dla obciążenia równomiernego
+    // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
     uniformCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
     uniformCanvas.height = chartHeight * 2;
@@ -202,9 +202,7 @@ function drawCharts(result) {
                 borderColor: 'blue',
                 borderWidth: 2,
                 fill: false,
-                pointRadius: 0,
-                tension: 0.1,
-                borderDash: [5, 5]
+                tension: 0.4 // Gładka parabola
             }]
         },
         options: {
@@ -214,7 +212,7 @@ function drawCharts(result) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Odległość (m)'
+                        text: 'Odległość [m]'
                     },
                     min: 0,
                     max: L,
@@ -228,11 +226,11 @@ function drawCharts(result) {
                 y: {
                     title: {
                         display: true,
-                        text: 'Moment (kg·m)'
+                        text: 'Moment [kg·m]'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.uniform_moment) * 1.2 || -10, // Dynamiczny zakres
-                    max: 0,
+                    min: Math.min(...result.uniform_moment) * 1.2 || -10, // Dynamiczne minimum z marginesem
+                    max: 0, // Momenty są ujemne, więc górna granica to 0
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.uniform_moment) * 1.2) / 5 || 2,
                         font: {
@@ -264,7 +262,7 @@ function drawCharts(result) {
         }
     });
 
-    // Nowy wykres dla obciążeń punktowych
+    // Wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
     pointCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
     pointCanvas.height = chartHeight * 2;
@@ -280,9 +278,7 @@ function drawCharts(result) {
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: false,
-                pointRadius: 0,
-                tension: 0.1,
-                borderDash: [5, 5]
+                tension: 0 // Linie proste
             }]
         },
         options: {
@@ -292,7 +288,7 @@ function drawCharts(result) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Odległość (m)'
+                        text: 'Odległość [m]'
                     },
                     min: 0,
                     max: L,
@@ -306,11 +302,11 @@ function drawCharts(result) {
                 y: {
                     title: {
                         display: true,
-                        text: 'Moment (kg·m)'
+                        text: 'Moment [kg·m]'
                     },
                     beginAtZero: true,
-                    min: Math.min(...result.point_moment_values) * 1.2 || -10, // Dynamiczny zakres
-                    max: 0,
+                    min: Math.min(...result.point_moment_values) * 1.2 || -10, // Dynamiczne minimum z marginesem
+                    max: 0, // Momenty są ujemne, więc górna granica to 0
                     ticks: {
                         stepSize: Math.abs(Math.min(...result.point_moment_values) * 1.2) / 5 || 2,
                         font: {
