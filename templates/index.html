@@ -9,6 +9,12 @@
     <script src="/static/script.js" defer></script>
 </head>
 <body>
+    <!-- Dodajemy element audio z automatycznym odtwarzaniem i pętlą -->
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="/static/background_music.mp3" type="audio/mpeg">
+        Twoja przeglądarka nie obsługuje odtwarzania audio.
+    </audio>
+
     <h1>Podwieszenia instalacji do blachy trapezowej</h1>
     <div class="input-container">
         <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label>
