@@ -50,15 +50,17 @@ def calculate():
     # Obliczenie obciążenia liniowego (kg/m) na podstawie obciążenia powierzchniowego i rozstawu fałd
     load_kg_m = load_kg_m2 * (spacing_mm / 1000)  # Przeliczamy mm na m
 
-    # Siły punktowe
+    # Siły punktowe z sumowaniem odległości
     forces = []
-    distances = []
+    cumulative_distances = []
+    total_distance = 0
     for i in range(1, 7):
         force = float(data[f'P{i}'])
         distance = float(data[f'x{i}'])
-        if force > 0 and 0 <= distance <= L:
+        if force > 0 and total_distance + distance <= L:  # Sprawdzamy, czy nie przekraczamy L
             forces.append(force)
-            distances.append(distance)
+            total_distance += distance
+            cumulative_distances.append(total_distance)
 
     # Obliczenia dla obciążenia równomiernego
     x_step = 0.1  # Stały krok co 0.1 m
@@ -69,7 +71,7 @@ def calculate():
     # Obliczenia dla obciążeń punktowych
     point_moment = np.zeros_like(x_values)
     for i, force in enumerate(forces):
-        a = distances[i]  # Odległość od początku belki (już nie sumujemy)
+        a = cumulative_distances[i]  # Pozycja sumowana od początku
         # Reakcje w podporach
         R_A = force * (L - a) / L  # Reakcja w lewej podporze
         # Moment w punkcie x
@@ -95,7 +97,7 @@ def calculate():
         "uniform_moment": uniform_moment.tolist(),
         "point_moment_values": point_moment.tolist(),
         "forces": forces,
-        "distances": distances,
+        "distances": cumulative_distances,  # Używamy sumowanych odległości
         "load_kg_m": load_kg_m,
         "spacing_mm": spacing_mm,
         "max_uniform_moment": float(max_uniform_moment),
