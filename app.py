@@ -49,7 +49,8 @@ def calculate():
         return jsonify({"status": "Błąd: Pozycje sił muszą być w zakresie [0, L]"})
 
     # Obliczenia dla obciążenia równomiernego
-    x_values = np.arange(0, L + 0.1, 0.1)  # Dokładny zakres od 0 do L z krokiem 0.1 m
+    x_step = 0.1  # Stały krok
+    x_values = np.arange(0, L + x_step, x_step)  # Pełny zakres od 0 do L
     uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
 
     # Obliczenia dla obciążeń punktowych
