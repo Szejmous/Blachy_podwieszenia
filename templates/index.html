@@ -11,7 +11,7 @@
 <body>
     <h1>Obliczenia blach podwieszeń</h1>
     <div class="input-container">
-        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="6.74" onchange="calculate()" oninput="calculate()"></label>
+        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label>
         <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6.0" onchange="calculate()" oninput="calculate()"></label>
         <label>Producent:
             <select id="producent" onchange="updateBlachy()">
@@ -20,13 +20,21 @@
                 <option value="BP2">BP2</option>
             </select>
         </label>
-        <label>Blacha: <select id="blacha" onchange="calculate()"></select></label>
+        <label>Blacha: <select id="blacha" onchange="calculate()">
+            <option value="T130" selected>T130</option>
+            <option value="T135">T135</option>
+            <option value="T135P">T135P</option>
+            <option value="T140">T140</option>
+            <option value="T150">T150</option>
+            <option value="T155">T155</option>
+            <option value="T160">T160</option>
+        </select></label>
         <div id="forces-inputs"></div>
         <button onclick="calculate()">Oblicz</button>
         <div><strong>Status: </strong><span id="result">Oczekiwanie...</span></div>
     </div>
 
-    <h2>Belka - obciążenie równomierne</h2>
+    <h2 id="uniform-load-heading">Fałda obciążona obciążeniem ciągłym</h2>
     <canvas id="uniformBeam"></canvas>
     <div class="chart-container">
         <canvas id="uniformMomentChart"></canvas>
