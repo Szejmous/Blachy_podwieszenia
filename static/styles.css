@@ -4,7 +4,7 @@ body {
     background-color: #f5f5f5;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Wyśrodkowanie elementów */
+    align-items: center;
 }
 
 h1, h2, h3 {
@@ -12,8 +12,8 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 600px !important; /* Stała szerokość dla belek i wykresów */
-    height: 100px; /* Stała wysokość dla belek */
+    width: 600px !important; /* Stała szerokość */
+    height: auto; /* Automatyczna wysokość dla responsywności */
     margin-top: 10px;
     border: 1px solid #ccc;
     background-color: #fff;
@@ -21,7 +21,7 @@ canvas {
 }
 
 #uniformMomentChart, #pointMomentChart {
-    height: 300px !important; /* Wysokość dla wykresów */
+    height: 300px !important; /* Stała wysokość dla wykresów */
 }
 
 .input-container {
@@ -30,7 +30,7 @@ canvas {
 
 label {
     margin-right: 10px;
-    display: block; /* Upewnij się, że etykiety są w pionie */
+    display: block;
 }
 
 .force-label {
@@ -47,7 +47,7 @@ input[type="number"], select {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
-    width: 100px; /* Stała szerokość dla spójności */
+    width: 100px;
 }
 
 button {
