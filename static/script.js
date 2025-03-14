@@ -184,7 +184,8 @@ function drawCharts(result) {
 
     const L = result.L;
     const chartWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600;
-    const chartHeight = 300;
+    // Ustawienie wysokości proporcjonalnie do szerokości (proporcja 2:1)
+    const chartHeight = Math.min(chartWidth / 2, 400); // Maksymalna wysokość 400px
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
