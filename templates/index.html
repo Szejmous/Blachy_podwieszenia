@@ -12,7 +12,18 @@
 
     <div>
         <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="0"></label><br>
-        <label>Rozstaw fałd (mm): <input id="spacing_mm" type="number" value="0"></label><br>
+        <label>Producent blachy:
+            <select id="producent" onchange="updateBlachy()">
+                {% for producent in producenci %}
+                    <option value="{{ producent }}">{{ producent }}</option>
+                {% endfor %}
+            </select>
+        </label><br>
+        <label>Model blachy:
+            <select id="blacha">
+                <!-- Opcje zostaną wypełnione przez JavaScript -->
+            </select>
+        </label><br>
         <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="1"></label>
     </div>
 
