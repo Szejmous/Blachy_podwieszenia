@@ -3,9 +3,34 @@ import numpy as np
 
 app = Flask(__name__)
 
+# Baza danych blach trapezowych
+BLACHY = {
+    "Pruszyński": {
+        "T130": 337,
+        "T135": 317,
+        "T135P": 310,
+        "T140": 304,
+        "T150": 290,
+        "T155": 280,
+        "T160": 260
+    },
+    "ArcelorMittal": {
+        "Hacierco 136/337": 337,
+        "Hacierco 135/315": 315,
+        "Hacierco 150/290": 290
+    },
+    "BP2": {
+        "T130": 337,
+        "T135-930": 310,
+        "T135-950": 316.67,
+        "T153-860": 287,
+        "T160": 250
+    }
+}
+
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html", producenci=BLACHY.keys())
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -13,7 +38,9 @@ def calculate():
 
     # Dane wejściowe
     load_kg_m2 = float(data["load_kg_m2"])
-    spacing_mm = float(data["spacing_mm"]) / 1000  # Konwersja na metry
+    producent = data["producent"]
+    blacha = data["blacha"]
+    spacing_mm = BLACHY[producent][blacha] / 1000  # Rozstaw z bazy w metrach
     L = float(data["beam_span"])  # Rozpiętość belki w metrach
 
     # Obciążenie na fałdę (kg/m)
@@ -52,7 +79,7 @@ def calculate():
 
     # Obliczanie momentów od sił punktowych w punktach sił i na końcach
     moment_values = []  # Momenty w miejscach sił
-    point_moment_x = [0] + cumulative_distances + [L]  # Punkty x dla wykresu (0, miejsca sił, L)
+    point_moment_x = [0] + cumulative_distances + [L]  # Punkty x dla wykresu
     point_moment_values = [0]  # Moment na początku belki (0)
     current_moment = 0
     for i, x in enumerate(cumulative_distances):
@@ -69,6 +96,7 @@ def calculate():
     return jsonify({
         "load_kg_m": load_kg_m,
         "L": L,
+        "spacing_mm": spacing_mm * 1000,  # Zwracam w mm dla frontend
         "max_moment_uniform": max_moment_uniform,
         "uniform_moment": uniform_moment,
         "x_values": x_values.tolist(),
