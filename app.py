@@ -15,8 +15,8 @@ def calculate():
     data = request.get_json()
     
     # Pobranie danych z formularza
-    L = float(data.get('beam_span', 1))  # Długość belki w metrach
-    load_kg_m2 = float(data.get('load_kg_m2', 0))  # Obciążenie w kg/m²
+    L = float(data.get('beam_span', 6))  # Długość belki w metrach (domyślnie 6 m)
+    load_kg_m2 = float(data.get('load_kg_m2', 20))  # Obciążenie w kg/m² (domyślnie 20 kg/m²)
     producent = data.get('producent', 'Pruszyński')
     blacha = data.get('blacha', 'T130')
     
@@ -35,12 +35,13 @@ def calculate():
     forces = [f for f in forces if f > 0]  # Usuń zera
     distances = [d for d, f in zip(distances, forces) if f > 0]  # Usuń zera
 
-    # Obliczanie pozycji jako sumy przyrostów
-    absolute_distances = []
+    # Obliczanie pozycji jako sumy przyrostów (zaczynamy od 0)
+    absolute_distances = [0]  # Start od 0
     current_pos = 0
     for d in distances:
         current_pos += d
-        absolute_distances.append(current_pos)
+        if current_pos <= L:  # Upewnij się, że pozycja nie przekracza L
+            absolute_distances.append(current_pos)
 
     # Walidacja danych
     if L <= 0:
@@ -49,26 +50,33 @@ def calculate():
         return jsonify({"status": "Błąd: Pozycje sił muszą być w zakresie [0, L]"})
 
     # Obliczenia dla obciążenia równomiernego
-    x_step = 0.1  # Stały krok
-    x_values = np.arange(0, L + x_step, x_step)  # Pełny zakres od 0 do L
-    uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
+    x_step = L / 10  # Krok co L/10
+    x_values = np.arange(0, L + x_step, x_step)  # Punkty od 0 do L z krokiem L/10
+    uniform_moment = []
+    R_A = load_kg_m * L / 2  # Reakcja w A (symetryczne obciążenie)
+    R_B = R_A  # Reakcja w B
+    for x in x_values:
+        M = R_A * x - (load_kg_m * x * x) / 2  # Moment w punkcie x
+        uniform_moment.append(-M)  # Ujemny moment zgodnie z konwencją
 
-    # Obliczenia dla obciążeń punktowych w punktach co L/10
-    R_A = sum(f * (L - d) for f, d in zip(forces, absolute_distances)) / L  # Reakcja w A
-    R_B = sum(f * d for f, d in zip(forces, absolute_distances)) / L  # Reakcja w B
-    step = L / 10  # Krok co L/10
-    point_moment_x = np.arange(0, L + step, step)  # Punkty co L/10
+    # Obliczenia dla obciążeń punktowych
+    total_force = sum(forces)
+    if total_force > 0:
+        R_A = sum(f * (L - d) for f, d in zip(forces, absolute_distances[1:])) / L  # Reakcja w A
+        R_B = total_force - R_A  # Reakcja w B (równowaga sił)
+    else:
+        R_A = R_B = 0
     point_moment_values = []
-    for x in point_moment_x:
+    for x in x_values:
         M = R_A * x
-        for f, d in zip(forces, absolute_distances):
+        for f, d in zip(forces, absolute_distances[1:]):
             if x > d:
                 M -= f * (x - d)
-        point_moment_values.append(-M)  # Ujemne wartości zgodnie z konwencją
+        point_moment_values.append(-M)  # Ujemny moment zgodnie z konwencją
 
     # Maksymalne wartości momentów
-    max_uniform_moment = min(uniform_moment)  # Minimum, bo momenty są ujemne
-    max_point_moment = min(point_moment_values)  # Minimum, bo momenty są ujemne
+    max_uniform_moment = min(uniform_moment) if uniform_moment else 0
+    max_point_moment = min(point_moment_values) if point_moment_values else 0
     max_continuous_moment_theoretical = - (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
     return jsonify({
@@ -78,10 +86,9 @@ def calculate():
         "spacing_mm": spacing_mm,
         "x_values": x_values.tolist(),
         "uniform_moment": uniform_moment,
-        "point_moment_x": point_moment_x.tolist(),
         "point_moment_values": point_moment_values,
         "forces": forces,
-        "distances": absolute_distances,  # Zwracamy absolutne pozycje
+        "distances": absolute_distances[1:],  # Zwracamy tylko przyrostowe pozycje
         "max_uniform_moment": max_uniform_moment,
         "max_point_moment": max_point_moment,
         "max_continuous_moment_theoretical": max_continuous_moment_theoretical
