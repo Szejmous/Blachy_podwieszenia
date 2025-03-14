@@ -72,19 +72,18 @@ function drawBeams(result) {
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
     const pointBeamCanvas = document.getElementById("pointBeam");
-    uniformBeamCanvas.width = canvasWidth * 2; // Podwójna rozdzielczość dla ostrości
-    uniformBeamCanvas.height = canvasHeight * 2;
+    uniformBeamCanvas.width = canvasWidth; // Usunięto podwójną rozdzielczość
+    uniformBeamCanvas.height = canvasHeight;
     uniformBeamCanvas.style.width = `${canvasWidth}px`;
     uniformBeamCanvas.style.height = `${canvasHeight}px`;
-    pointBeamCanvas.width = canvasWidth * 2;
-    pointBeamCanvas.height = canvasHeight * 2;
+    pointBeamCanvas.width = canvasWidth;
+    pointBeamCanvas.height = canvasHeight;
     pointBeamCanvas.style.width = `${canvasWidth}px`;
     pointBeamCanvas.style.height = `${canvasHeight}px`;
 
     // Belka - obciążenie równomierne
     let uniformCtx = uniformBeamCanvas.getContext("2d");
-    uniformCtx.clearRect(0, 0, canvasWidth * 2, canvasHeight * 2);
-    uniformCtx.scale(2, 2); // Skala dla ostrości
+    uniformCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
     uniformCtx.lineWidth = 1;
@@ -118,8 +117,7 @@ function drawBeams(result) {
 
     // Belka - obciążenia punktowe
     let pointCtx = pointBeamCanvas.getContext("2d");
-    pointCtx.clearRect(0, 0, canvasWidth * 2, canvasHeight * 2);
-    pointCtx.scale(2, 2); // Skala dla ostrości
+    pointCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
     pointCtx.lineWidth = 1;
@@ -183,16 +181,11 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    const chartWidth = document.getElementById('uniformMomentChart').parentElement.clientWidth || 600;
-    // Ustawienie wysokości proporcjonalnie do szerokości (proporcja 2:1)
-    const chartHeight = Math.min(chartWidth / 2, 400); // Maksymalna wysokość 400px
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
-    uniformCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
-    uniformCanvas.height = chartHeight * 2;
-    uniformCanvas.style.width = `${chartWidth}px`;
-    uniformCanvas.style.height = `${chartHeight}px`;
+    uniformCanvas.style.width = '100%'; // Pełna szerokość
+    uniformCanvas.style.height = '100%'; // Pełna wysokość (zdefiniowana w CSS)
     uniformChart = new Chart(uniformCanvas, {
         type: 'line',
         data: {
@@ -265,10 +258,8 @@ function drawCharts(result) {
 
     // Wykres dla obciążeń punktowych
     const pointCanvas = document.getElementById('pointMomentChart');
-    pointCanvas.width = chartWidth * 2; // Podwójna rozdzielczość
-    pointCanvas.height = chartHeight * 2;
-    pointCanvas.style.width = `${chartWidth}px`;
-    pointCanvas.style.height = `${chartHeight}px`;
+    pointCanvas.style.width = '100%'; // Pełna szerokość
+    pointCanvas.style.height = '100%'; // Pełna wysokość (zdefiniowana w CSS)
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
