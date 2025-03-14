@@ -17,7 +17,7 @@ h1, h2, h3 {
     max-width: 600px; /* Maksymalna szerokość */
     height: 300px; /* Stała wysokość ramki */
     margin-top: 10px;
-    position: relative; /* Umożliwia pozsycjonowanie canvasu */
+    position: relative; /* Umożliwia pozycjonowanie canvasu */
 }
 
 canvas {
