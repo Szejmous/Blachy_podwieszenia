@@ -46,8 +46,6 @@ def calculate():
     # Obliczenia dla obciążenia równomiernego
     x_values = np.arange(0, L + 0.1, 0.1)  # Dokładny zakres od 0 do L z krokiem 0.1 m
     uniform_moment = [- (load_kg_m * x * (L - x)) / 2 for x in x_values]  # Poprawna parabola
-    max_uniform_moment = min(uniform_moment)  # Minimum, bo momenty są ujemne
-    max_continuous_moment_theoretical = - (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
     # Obliczenia dla obciążeń punktowych
     R_A = sum(f * (L - d) for f, d in zip(forces, distances)) / L  # Reakcja w A
@@ -60,7 +58,11 @@ def calculate():
             if x > d:
                 M -= f * (x - d)
         point_moment_values.append(-M)  # Ujemne wartości zgodnie z konwencją
+
+    # Maksymalne wartości momentów
+    max_uniform_moment = min(uniform_moment)  # Minimum, bo momenty są ujemne
     max_point_moment = min(point_moment_values)  # Minimum, bo momenty są ujemne
+    max_continuous_moment_theoretical = - (load_kg_m * L * L) / 8  # Maksymalny moment teoretyczny
 
     return jsonify({
         "status": "Poprawne obliczenia",
