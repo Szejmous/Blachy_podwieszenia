@@ -16,6 +16,7 @@ canvas {
 
 label {
     margin-right: 10px;
+    display: block; /* Upewnij się, że etykiety są w pionie */
 }
 
 .force-label {
@@ -32,6 +33,7 @@ input[type="number"], select {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    width: 100px; /* Stała szerokość dla spójności */
 }
 
 button {
@@ -41,6 +43,7 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 10px;
 }
 
 button:hover {
