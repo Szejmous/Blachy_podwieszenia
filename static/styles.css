@@ -1,7 +1,9 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
-    background-color: #f5f5f5;
+    /* Dodajemy gradient jako tło */
+    background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+    /* Jasnoniebieski gradient: #87CEEB (Sky Blue) do #E0F6FF (jasny niebieski) */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,7 +23,7 @@ h1, h2, h3 {
 }
 
 canvas {
-    width: 100%; /* Pełna szerokość w skontenerze */
+    width: 100%; /* Pełna szerokość w kontenerze */
     height: 100%; /* Pełna wysokość w kontenerze */
     border: 1px solid #ccc;
     background-color: #fff;
@@ -86,4 +88,12 @@ button:hover {
 
 #toggleMusic:hover {
     background-color: #0056b3;
+}
+
+/* Styl dla obrazka pingwinki.png */
+#pingwinki-image {
+    max-width: 100%; /* Zapobiega przekroczeniu szerokości strony */
+    width: 300px; /* Domyślna szerokość obrazka */
+    height: auto; /* Zachowuje proporcje */
+    margin: 10px 0; /* Odstęp od góry i dołu */
 }
