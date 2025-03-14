@@ -2,35 +2,29 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Kalkulator Belki</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script defer src="/static/script.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obliczenia blach podwieszeń</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/script.js" defer></script>
 </head>
 <body>
-    <h1>Kalkulator Belki</h1>
-
+    <h1>Obliczenia blach podwieszeń</h1>
     <div class="input-container">
-        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label><br>
-        <label>Producent blachy:
-            <select id="producent" onchange="updateBlachy(); calculate()">
-                {% for producent in producenci %}
-                    <option value="{{ producent }}" {% if producent == "Pruszyński" %}selected{% endif %}>{{ producent }}</option>
-                {% endfor %}
+        <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="6.74" onchange="calculate()" oninput="calculate()"></label>
+        <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6.0" onchange="calculate()" oninput="calculate()"></label>
+        <label>Producent:
+            <select id="producent" onchange="updateBlachy()">
+                <option value="Pruszyński" selected>Pruszyński</option>
+                <option value="ArcelorMittal">ArcelorMittal</option>
+                <option value="BP2">BP2</option>
             </select>
-        </label><br>
-        <label>Model blachy:
-            <select id="blacha" onchange="calculate()">
-                <!-- Opcje zostaną wypełnione przez JavaScript -->
-            </select>
-        </label><br>
-        <label>Rozpiętość belki (m): <input id="beam_span" type="number" value="6" onchange="calculate()" oninput="calculate()"></label>
+        </label>
+        <label>Blacha: <select id="blacha" onchange="calculate()"></select></label>
+        <div id="forces-inputs"></div>
+        <button onclick="calculate()">Oblicz</button>
+        <div><strong>Status: </strong><span id="result">Oczekiwanie...</span></div>
     </div>
-
-    <h2>Siły punktowe</h2>
-    <div id="forces-inputs"></div>
-
-    <h3>Wynik: <span id="result" style="color: red;"></span></h3>
 
     <h2>Belka - obciążenie równomierne</h2>
     <canvas id="uniformBeam"></canvas>
