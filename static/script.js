@@ -201,8 +201,9 @@ function drawCharts(result) {
     if (pointChart) pointChart.destroy();
 
     const L = result.L;
-    // Ujednolicony krok na osi X (np. co 1 m)
-    const xStep = Math.ceil(L / 5); // Dzielimy belkę na 5 części
+    // Ujednolicony krok na osi X co L/10
+    const xStep = L / 10; // Krok co L/10
+    const xLabels = Array.from({ length: 11 }, (_, i) => (i * xStep).toFixed(2)); // Etykiety: 0, L/10, 2L/10, ..., L
 
     // Wykres dla obciążenia równomiernego
     const uniformCanvas = document.getElementById('uniformMomentChart');
@@ -231,9 +232,16 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L, // Pełny zakres od 0 do L
+                    max: L,
                     ticks: {
-                        stepSize: xStep, // Ujednolicony krok
+                        callback: function(value) {
+                            // Pokazujemy tylko wartości co L/10
+                            const step = L / 10;
+                            if (Math.abs(value % step) < 0.001 || Math.abs(value - L) < 0.001) {
+                                return value.toFixed(1);
+                            }
+                            return null;
+                        },
                         font: {
                             size: 14
                         }
@@ -285,7 +293,7 @@ function drawCharts(result) {
     pointChart = new Chart(pointCanvas, {
         type: 'line',
         data: {
-            labels: result.point_moment_x.map(x => x.toFixed(2)), // Używamy rzeczywistych pozycji
+            labels: result.point_moment_x.map(x => x.toFixed(2)),
             datasets: [{
                 label: 'Moment (kg·m)',
                 data: result.point_moment_values,
@@ -305,9 +313,16 @@ function drawCharts(result) {
                         text: 'Odległość [m]'
                     },
                     min: 0,
-                    max: L, // Pełny zakres od 0 do L
+                    max: L,
                     ticks: {
-                        stepSize: xStep, // Ujednolicony krok
+                        callback: function(value) {
+                            // Pokazujemy tylko wartości co L/10
+                            const step = L / 10;
+                            if (Math.abs(value % step) < 0.001 || Math.abs(value - L) < 0.001) {
+                                return value.toFixed(1);
+                            }
+                            return null;
+                        },
                         font: {
                             size: 14
                         }
