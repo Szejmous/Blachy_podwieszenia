@@ -28,7 +28,7 @@ label {
     font-weight: bold;
 }
 
-input[type="number"] {
+input[type="number"], select {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
