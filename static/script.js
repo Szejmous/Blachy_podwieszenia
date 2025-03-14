@@ -64,10 +64,10 @@ async function calculate() {
 }
 
 function drawBeams(result) {
-    const canvasWidth = 600; // Stała szerokość canvasu
+    const canvasWidth = 600; // Stała szerokość bazowa
     const canvasHeight = 100; // Stała wysokość dla belek
-    const beamHeight = 20; // Stała wysokość belki
-    const supportWidth = 20; // Stała szerokość podpór
+    const beamHeight = 20; // Wysokość belki
+    const supportWidth = 20; // Szerokość podpór
 
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
@@ -83,32 +83,32 @@ function drawBeams(result) {
     uniformCtx.beginPath();
     uniformCtx.strokeStyle = "black";
     uniformCtx.lineWidth = 2;
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 - 30); // Belka podniesiona o 30px
-    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 30);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 - 10); // Podpora lewa (trójkąt, wierzchołek na dole)
-    uniformCtx.lineTo(supportWidth - 10, canvasHeight / 2 - 30);
-    uniformCtx.lineTo(supportWidth + 10, canvasHeight / 2 - 30);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Belka na środku
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
+    uniformCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
     uniformCtx.closePath();
     uniformCtx.fillStyle = "black";
     uniformCtx.fill();
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 - 10); // Podpora prawa (trójkąt, wierzchołek na dole)
-    uniformCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - 30);
-    uniformCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - 30);
+    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Prawa podpora (trójkąt w dół)
+    uniformCtx.lineTo(canvasWidth - supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
+    uniformCtx.lineTo(canvasWidth - supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
     uniformCtx.closePath();
     uniformCtx.fill();
     uniformCtx.stroke();
     uniformCtx.font = "12px Arial";
     uniformCtx.fillStyle = "black";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 100, canvasHeight / 2 - 50);
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2 - 100, canvasHeight / 2 - 10);
 
     // Wymiar całkowity
     uniformCtx.beginPath();
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 - 15);
-    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 15);
-    uniformCtx.moveTo(supportWidth, canvasHeight / 2 - 20); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 - 15); uniformCtx.lineTo(supportWidth, canvasHeight / 2 - 10);
-    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 - 20); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 - 15); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 10);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2 + 5);
+    uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 5);
+    uniformCtx.moveTo(supportWidth, canvasHeight / 2); uniformCtx.lineTo(supportWidth + 5, canvasHeight / 2 + 5); uniformCtx.lineTo(supportWidth, canvasHeight / 2 + 10);
+    uniformCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); uniformCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 5); uniformCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 10);
     uniformCtx.stroke();
-    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 - 25);
+    uniformCtx.fillText(`${result.L} m`, canvasWidth / 2 - 10, canvasHeight / 2 + 15);
 
     // Belka - obciążenia punktowe
     let pointCtx = pointBeamCanvas.getContext("2d");
@@ -116,17 +116,17 @@ function drawBeams(result) {
     pointCtx.beginPath();
     pointCtx.strokeStyle = "black";
     pointCtx.lineWidth = 2;
-    pointCtx.moveTo(supportWidth, canvasHeight / 2 - 30); // Belka podniesiona o 30px
-    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 30);
-    pointCtx.moveTo(supportWidth, canvasHeight / 2 - 10); // Podpora lewa (trójkąt, wierzchołek na dole)
-    pointCtx.lineTo(supportWidth - 10, canvasHeight / 2 - 30);
-    pointCtx.lineTo(supportWidth + 10, canvasHeight / 2 - 30);
+    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Belka na środku
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2);
+    pointCtx.moveTo(supportWidth, canvasHeight / 2); // Lewa podpora (trójkąt w dół)
+    pointCtx.lineTo(supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
     pointCtx.closePath();
     pointCtx.fillStyle = "black";
     pointCtx.fill();
-    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 - 10); // Podpora prawa (trójkąt, wierzchołek na dole)
-    pointCtx.lineTo(canvasWidth - supportWidth - 10, canvasHeight / 2 - 30);
-    pointCtx.lineTo(canvasWidth - supportWidth + 10, canvasHeight / 2 - 30);
+    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2); // Prawa podpora (trójkąt w dół)
+    pointCtx.lineTo(canvasWidth - supportWidth - supportWidth / 2, canvasHeight / 2 + beamHeight);
+    pointCtx.lineTo(canvasWidth - supportWidth + supportWidth / 2, canvasHeight / 2 + beamHeight);
     pointCtx.closePath();
     pointCtx.fill();
     pointCtx.stroke();
@@ -136,36 +136,36 @@ function drawBeams(result) {
         let x = supportWidth + (result.distances[i] / L) * (canvasWidth - 2 * supportWidth);
         pointCtx.strokeStyle = "blue";
         pointCtx.beginPath();
-        pointCtx.moveTo(x, canvasHeight / 2 - 30); // Początek strzałki podniesiony
-        pointCtx.lineTo(x, canvasHeight / 2 - 10); // W dół
-        pointCtx.lineTo(x - 5, canvasHeight / 2 - 15); // Lewa część grotu
-        pointCtx.moveTo(x, canvasHeight / 2 - 10);
-        pointCtx.lineTo(x + 5, canvasHeight / 2 - 15); // Prawa część grotu
+        pointCtx.moveTo(x, canvasHeight / 2);
+        pointCtx.lineTo(x, canvasHeight / 2 + 20);
+        pointCtx.lineTo(x - 5, canvasHeight / 2 + 15);
+        pointCtx.moveTo(x, canvasHeight / 2 + 20);
+        pointCtx.lineTo(x + 5, canvasHeight / 2 + 15);
         pointCtx.stroke();
         pointCtx.fillStyle = "blue";
-        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 - 40); // Tekst powyżej siły
+        pointCtx.fillText(`P${i + 1} = ${result.forces[i]} kg`, x - 20, canvasHeight / 2 + 30);
     }
     pointCtx.stroke();
 
-    // Wymiary z domiarami, powyżej sił z większym odstępem
+    // Wymiary z domiarami
     pointCtx.strokeStyle = "green";
     pointCtx.fillStyle = "green";
     pointCtx.beginPath();
     let prevX = supportWidth;
     for (let i = 0; i < result.distances.length; i++) {
         let x = supportWidth + (result.distances[i] / L) * (canvasWidth - 2 * supportWidth);
-        pointCtx.moveTo(prevX, canvasHeight / 2 - 50); // Wyżej, powyżej sił
-        pointCtx.lineTo(x, canvasHeight / 2 - 50);
-        pointCtx.moveTo(prevX, canvasHeight / 2 - 55); pointCtx.lineTo(prevX + 5, canvasHeight / 2 - 50); pointCtx.lineTo(prevX, canvasHeight / 2 - 45);
-        pointCtx.moveTo(x, canvasHeight / 2 - 55); pointCtx.lineTo(x - 5, canvasHeight / 2 - 50); pointCtx.lineTo(x, canvasHeight / 2 - 45);
-        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, canvasHeight / 2 - 60);
+        pointCtx.moveTo(prevX, canvasHeight / 2 + 25);
+        pointCtx.lineTo(x, canvasHeight / 2 + 25);
+        pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
+        pointCtx.moveTo(x, canvasHeight / 2 + 20); pointCtx.lineTo(x - 5, canvasHeight / 2 + 25); pointCtx.lineTo(x, canvasHeight / 2 + 30);
+        pointCtx.fillText(`${(result.distances[i] - (i > 0 ? result.distances[i - 1] : 0)).toFixed(2)} m`, (prevX + x) / 2 - 10, canvasHeight / 2 + 35);
         prevX = x;
     }
-    pointCtx.moveTo(prevX, canvasHeight / 2 - 50);
-    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 50);
-    pointCtx.moveTo(prevX, canvasHeight / 2 - 55); pointCtx.lineTo(prevX + 5, canvasHeight / 2 - 50); pointCtx.lineTo(prevX, canvasHeight / 2 - 45);
-    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 - 55); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 - 50); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 - 45);
-    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2 - 10, canvasHeight / 2 - 60);
+    pointCtx.moveTo(prevX, canvasHeight / 2 + 25);
+    pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 25);
+    pointCtx.moveTo(prevX, canvasHeight / 2 + 20); pointCtx.lineTo(prevX + 5, canvasHeight / 2 + 25); pointCtx.lineTo(prevX, canvasHeight / 2 + 30);
+    pointCtx.moveTo(canvasWidth - supportWidth, canvasHeight / 2 + 20); pointCtx.lineTo(canvasWidth - supportWidth - 5, canvasHeight / 2 + 25); pointCtx.lineTo(canvasWidth - supportWidth, canvasHeight / 2 + 30);
+    pointCtx.fillText(`${(L - (result.distances.length > 0 ? result.distances[result.distances.length - 1] : 0)).toFixed(2)} m`, (prevX + canvasWidth - supportWidth) / 2 - 10, canvasHeight / 2 + 35);
     pointCtx.stroke();
 }
 
@@ -190,17 +190,17 @@ function drawCharts(result) {
         options: {
             maintainAspectRatio: false,
             responsive: true,
-            aspectRatio: 2, // Proporcja 1:1 z uwzględnieniem etykiet
-            scales: { 
-                y: { 
-                    beginAtZero: false, 
-                    reverse: true, 
+            aspectRatio: 2,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    reverse: true,
                     title: { display: true, text: 'Moment (kg·m)' },
                     ticks: { stepSize: 10 },
-                    min: Math.min(...result.uniform_moment) * 1.1, // Dostosowanie skali
+                    min: Math.min(...result.uniform_moment) * 1.1,
                     max: 0
                 },
-                x: { 
+                x: {
                     title: { display: true, text: 'Odległość (m)' },
                     min: 0,
                     max: L,
@@ -251,16 +251,16 @@ function drawCharts(result) {
             maintainAspectRatio: false,
             responsive: true,
             aspectRatio: 2,
-            scales: { 
-                y: { 
-                    beginAtZero: false, 
-                    reverse: true, 
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    reverse: true,
                     title: { display: true, text: 'Moment (kg·m)' },
                     ticks: { stepSize: 10 },
                     min: Math.min(...result.point_moment_values) * 1.1,
                     max: 0
                 },
-                x: { 
+                x: {
                     title: { display: true, text: 'Odległość (m)' },
                     min: 0,
                     max: L,
@@ -302,3 +302,8 @@ function drawCharts(result) {
         }
     });
 }
+
+// Obsługa zmiany rozmiaru okna (responsywność)
+window.addEventListener('resize', function () {
+    calculate(); // Ponowne narysowanie belek i wykresów przy zmianie rozmiaru
+});
