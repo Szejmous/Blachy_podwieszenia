@@ -9,15 +9,6 @@
     <script src="/static/script.js" defer></script>
 </head>
 <body>
-    <audio id="backgroundMusic" loop>
-        <source src="/static/background_music.mp3" type="audio/mpeg">
-        Twoja przeglądarka nie obsługuje odtwarzania audio.
-    </audio>
-
-    <button id="toggleMusic" onclick="toggleMusic()">Włącz muzykę</button>
-    <br> <!-- Dodajemy odstęp między przyciskiem a obrazkiem -->
-    <img src="/static/pingwinki.png" alt="Pingwinki" id="pingwinki-image">
-
     <h1>Podwieszenia instalacji do blachy trapezowej</h1>
     <div class="input-container">
         <label>Obciążenie (kg/m²): <input id="load_kg_m2" type="number" value="20" onchange="calculate()" oninput="calculate()"></label>
@@ -53,19 +44,5 @@
     <div class="chart-container">
         <canvas id="pointMomentChart"></canvas>
     </div>
-
-    <script>
-        function toggleMusic() {
-            const music = document.getElementById("backgroundMusic");
-            const button = document.getElementById("toggleMusic");
-            if (music.paused) {
-                music.play();
-                button.innerText = "Wyłącz muzykę";
-            } else {
-                music.pause();
-                button.innerText = "Włącz muzykę";
-            }
-        }
-    </script>
 </body>
 </html>
