@@ -84,11 +84,10 @@ async function calculate() {
     resultSpan.style.fontSize = "18px"; // Większa czcionka niż h2 (16px domyślnie)
     resultSpan.style.fontWeight = "bold";
 
-    // Aktualizacja nagłówka 
-
-document.getElementById("uniform-load-heading").innerText = `Pojedyncza fałda - maksymalne obciążenie wzdłuż równomiernie (nie punktowe) (q = ${result.load_kg_m.toFixed(2)} kg/m)`;
-document.getElementById("uniform-load-heading").style.fontSize = "16px";
-document.getElementById("uniform-load-heading").style.fontWeight = "bold";
+    // Aktualizacja nagłówka z obciążeniem ciągłym
+    document.getElementById("uniform-load-heading").innerText = `Pojedyncza fałda - maksymalne obciążenie wzdłuż równomiernie (nie punktowe) (q = ${result.load_kg_m.toFixed(2)} kg/m)`;
+    document.getElementById("uniform-load-heading").style.fontSize = "16px"; // Taka sama jak h2
+    document.getElementById("uniform-load-heading").style.fontWeight = "normal";
 
     // Usuń istniejące span-y, aby uniknąć duplikatów
     const uniformContainer = document.querySelector('#uniformMomentChart').parentElement;
