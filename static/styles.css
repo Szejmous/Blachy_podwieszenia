@@ -22,7 +22,7 @@ h1, h2, h3 {
 
 canvas {
     width: 100%; /* Pełna szerokość w kontenerze */
-    height: 100%; /* Pełna wysokość w kontenerze */
+    height: 120px; /* Zwiększona wysokość, aby zmieścić reakcje */
     border: 1px solid #ccc;
     background-color: #fff;
     display: block;
