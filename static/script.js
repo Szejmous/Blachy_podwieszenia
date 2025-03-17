@@ -174,10 +174,14 @@ function drawBeams(result) {
     uniformCtx.font = "12px Arial";
     uniformCtx.fillStyle = "black";
     uniformCtx.textAlign = "center";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 5);
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 15); // Przesunięto w górę, aby zrobić miejsce
 
-    // Wyświetlanie reakcji podporowych dla obciążenia równomiernego
+    // Wyświetlanie reakcji podporowych NAD podporami dla obciążenia równomiernego
     uniformCtx.fillStyle = "purple";
+    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad lewą podporą
+    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad prawą podporą
+
+    // Wyświetlanie reakcji podporowych POD podporami dla obciążenia równomiernego
     uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 + beamHeight + 40);
     uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 40);
 
@@ -229,8 +233,13 @@ function drawBeams(result) {
     }
     pointCtx.stroke();
 
-    // Wyświetlanie reakcji podporowych dla obciążeń punktowych
+    // Wyświetlanie reakcji podporowych NAD podporami dla obciążeń punktowych
     const isWithinReactionLimits = result.status_reaction === "OK";
+    pointCtx.fillStyle = isWithinReactionLimits ? "purple" : "red";
+    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad lewą podporą
+    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad prawą podporą
+
+    // Wyświetlanie reakcji podporowych POD podporami dla obciążeń punktowych
     pointCtx.fillStyle = isWithinReactionLimits ? "purple" : "red";
     pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 + beamHeight + 40);
     pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 40);
