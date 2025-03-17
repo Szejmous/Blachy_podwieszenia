@@ -138,7 +138,9 @@ function drawBeams(result) {
     const canvasHeight = 100; // Stała wysokość
     const beamHeight = 20; // Wysokość belki
     const supportWidth = 20; // Szerokość podpór
-    const offsetX = supportWidth / 2; // Przesunięcie w stronę środka belki (połowa szerokości podpory)
+    const charWidth = 7; // Przybliżona szerokość znaku w pikselach dla 12px Arial
+    const labelLength = 12; // Przybliżona liczba znaków w etykiecie (np. "R_A = 123.45 kg")
+    const offsetX = charWidth * labelLength; // Przesunięcie o długość etykiety (około 84 piksele)
 
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
@@ -180,8 +182,8 @@ function drawBeams(result) {
     // Wyświetlanie reakcji podporowych NAD podporami dla obciążenia równomiernego
     const isWithinReactionLimits = result.status_reaction === "OK";
     uniformCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
-    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo
-    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo
+    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo o długość etykiety
+    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo o długość etykiety
 
     // Wyświetlanie reakcji podporowych POD podporami dla obciążenia równomiernego
     uniformCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
@@ -238,8 +240,8 @@ function drawBeams(result) {
 
     // Wyświetlanie reakcji podporowych NAD podporami dla obciążeń punktowych
     pointCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
-    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo
-    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo
+    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo o długość etykiety
+    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo o długość etykiety
 
     // Wyświetlanie reakcji podporowych POD podporami dla obciążeń punktowych
     pointCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
