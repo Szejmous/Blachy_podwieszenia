@@ -87,8 +87,26 @@ def calculate():
     # Teoretyczny maksymalny moment ciągły (dla obciążenia równomiernego, bez odwrócenia)
     max_continuous_moment_theoretical = (load_kg_m * L**2) / 8
 
-    # Status
-    status = "Podwieszenie jest poprawne" if max_continuous_moment_theoretical > max_point_moment else "Zbyt duże obciążenie, zmień podwieszenie"
+    # Obliczanie reakcji podporowych dla obciążenia równomiernego
+    # Dla belki równomiernie obciążonej: R_A = R_B = (q * L) / 2
+    uniform_R_A = uniform_R_B = (load_kg_m * L) / 2
+
+    # Obliczanie reakcji podporowych dla obciążeń punktowych
+    # Suma sił w pionie i momentów względem jednej podpory
+    point_R_A = 0
+    point_R_B = 0
+    for i, force in enumerate(forces):
+        a = cumulative_distances[i]
+        point_R_A += force * (L - a) / L  # Reakcja w lewej podporze
+        point_R_B += force * a / L        # Reakcja w prawej podporze
+
+    # Status dla momentów (istniejący warunek)
+    status_moment = "Podwieszenie jest poprawne" if max_continuous_moment_theoretical > max_point_moment else "Zbyt duże obciążenie, zmień podwieszenie"
+
+    # Nowy status dla reakcji podporowych
+    status_reaction = "OK"
+    if point_R_A > uniform_R_A or point_R_B > uniform_R_B:
+        status_reaction = "Podwieszenie niepoprawne - zbyt duże siły przy podporach! Ścinanie blachy"
 
     # Przygotowanie danych do przesłania
     response_data = {
@@ -103,7 +121,12 @@ def calculate():
         "max_uniform_moment": float(max_uniform_moment),
         "max_point_moment": float(max_point_moment),
         "max_continuous_moment_theoretical": float(max_continuous_moment_theoretical),
-        "status": status
+        "status_moment": status_moment,  # Status dla momentów
+        "status_reaction": status_reaction,  # Status dla reakcji
+        "uniform_R_A": float(uniform_R_A),
+        "uniform_R_B": float(uniform_R_B),
+        "point_R_A": float(point_R_A),
+        "point_R_B": float(point_R_B)
     }
 
     print("Returned data:", response_data)
