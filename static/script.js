@@ -138,6 +138,7 @@ function drawBeams(result) {
     const canvasHeight = 100; // Stała wysokość
     const beamHeight = 20; // Wysokość belki
     const supportWidth = 20; // Szerokość podpór
+    const offsetX = supportWidth / 2; // Przesunięcie w stronę środka belki (połowa szerokości podpory)
 
     // Ustawienie wymiarów canvasu
     const uniformBeamCanvas = document.getElementById("uniformBeam");
@@ -174,16 +175,18 @@ function drawBeams(result) {
     uniformCtx.font = "12px Arial";
     uniformCtx.fillStyle = "black";
     uniformCtx.textAlign = "center";
-    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 15); // Przesunięto w górę, aby zrobić miejsce
+    uniformCtx.fillText(`q = ${result.load_kg_m.toFixed(2)} kg/m (rozstaw: ${result.spacing_mm.toFixed(2)} mm)`, canvasWidth / 2, canvasHeight / 2 - beamHeight - 15);
 
     // Wyświetlanie reakcji podporowych NAD podporami dla obciążenia równomiernego
-    uniformCtx.fillStyle = "purple";
-    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad lewą podporą
-    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad prawą podporą
+    const isWithinReactionLimits = result.status_reaction === "OK";
+    uniformCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
+    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo
+    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo
 
     // Wyświetlanie reakcji podporowych POD podporami dla obciążenia równomiernego
-    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 + beamHeight + 40);
-    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 40);
+    uniformCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
+    uniformCtx.fillText(`R_A = ${result.uniform_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 + beamHeight + 40);
+    uniformCtx.fillText(`R_B = ${result.uniform_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 + beamHeight + 40);
 
     // Wymiar całkowity (odsunięty w dół, aby nie nachodził na trójkąty)
     uniformCtx.beginPath();
@@ -234,15 +237,14 @@ function drawBeams(result) {
     pointCtx.stroke();
 
     // Wyświetlanie reakcji podporowych NAD podporami dla obciążeń punktowych
-    const isWithinReactionLimits = result.status_reaction === "OK";
-    pointCtx.fillStyle = isWithinReactionLimits ? "purple" : "red";
-    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad lewą podporą
-    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 - beamHeight - 5); // Nad prawą podporą
+    pointCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
+    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w prawo
+    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 - beamHeight - 5); // Przesunięte w lewo
 
     // Wyświetlanie reakcji podporowych POD podporami dla obciążeń punktowych
-    pointCtx.fillStyle = isWithinReactionLimits ? "purple" : "red";
-    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth, canvasHeight / 2 + beamHeight + 40);
-    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth, canvasHeight / 2 + beamHeight + 40);
+    pointCtx.fillStyle = isWithinReactionLimits ? "green" : "red";
+    pointCtx.fillText(`R_A = ${result.point_R_A.toFixed(2)} kg`, supportWidth + offsetX, canvasHeight / 2 + beamHeight + 40);
+    pointCtx.fillText(`R_B = ${result.point_R_B.toFixed(2)} kg`, canvasWidth - supportWidth - offsetX, canvasHeight / 2 + beamHeight + 40);
 
     // Wymiary z domiarami
     pointCtx.strokeStyle = "green";
