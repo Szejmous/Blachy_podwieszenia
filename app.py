@@ -92,7 +92,7 @@ def calculate():
     uniform_R_A = uniform_R_B = (load_kg_m * L) / 2
 
     # Obliczanie reakcji podporowych dla obciążeń punktowych
-    # Suma sił w pionie i momentów względem jednej podpory
+    # Pełne reakcje (do wyświetlania)
     point_R_A = 0
     point_R_B = 0
     for i, force in enumerate(forces):
@@ -100,12 +100,23 @@ def calculate():
         point_R_A += force * (L - a) / L  # Reakcja w lewej podporze
         point_R_B += force * a / L        # Reakcja w prawej podporze
 
+    # Obliczanie reakcji podporowych z wyłączeniem sił na podporach (do sprawdzenia ścinania)
+    point_R_A_adjusted = 0
+    point_R_B_adjusted = 0
+    for i, force in enumerate(forces):
+        a = cumulative_distances[i]
+        # Pomijamy siły na podporach (x = 0 dla lewej, x = L dla prawej)
+        if a == 0 or a == L:
+            continue
+        point_R_A_adjusted += force * (L - a) / L  # Reakcja w lewej podporze
+        point_R_B_adjusted += force * a / L        # Reakcja w prawej podporze
+
     # Status dla momentów (istniejący warunek)
     status_moment = "Podwieszenie jest poprawne" if max_continuous_moment_theoretical > max_point_moment else "Zbyt duże obciążenie, zmień podwieszenie"
 
-    # Nowy status dla reakcji podporowych
+    # Nowy status dla reakcji podporowych (używamy reakcji bez sił na podporach)
     status_reaction = "OK"
-    if point_R_A > uniform_R_A or point_R_B > uniform_R_B:
+    if point_R_A_adjusted > uniform_R_A or point_R_B_adjusted > uniform_R_B:
         status_reaction = "Podwieszenie niepoprawne - zbyt duże siły przy podporach! Ścinanie blachy"
 
     # Przygotowanie danych do przesłania
